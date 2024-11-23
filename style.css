@@ -1,0 +1,98 @@
+/*
+Theme Name: LUX Market
+Theme URI: https://market.luxoticmotors.com
+Author: Estrada Enterprises LLC
+Author URI: https://estradaenterprises.biz
+Description: Martfury Child Theme.
+Version: 0.0.2
+License: GNU General Public License v2+
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: martfury
+Domain Path: /lang/
+Tags: 
+Template: martfury
+*/
+
+input[type='submit'].dokan-btn-theme, a.dokan-btn-theme, .dokan-btn-theme {
+  background-color: #d70836;
+  border-color: #d70836;
+}
+
+.page-header .breadcrumbs a {
+  color: black;
+  text-decoration: underline;
+}
+
+/*
+ * Product
+ */
+.woocommerce .mf-single-product.mf-product-layout-4 .mf-product-detail {
+  background-color: black;
+}
+
+.single-product-layout-4 .site-content,
+.single-product-layout-4 .mf-product-instagram,
+.single-product-layout-4 section.up-sells, .single-product-layout-4 section.related,
+.single-product-layout-4 .mf-recently-products.footer-recently-viewed,
+.single-product-layout-4 .site-footer {
+  background-color: #1d1d1d;
+}
+
+.woocommerce div.product .product_title {
+  color: white;
+}
+
+.woocommerce div.product span.price, .woocommerce div.product p.price,
+.woocommerce div.product .mf-summary-header .sold-by-meta,
+.woocommerce div.product p.stock label,
+.woocommerce div.product .product_meta strong {
+  color: white;
+}
+
+.mf-recently-products .recently-header {
+  background-color: white;
+  margin-bottom: 0;
+  padding-top: 2rem;
+  padding-left: 2rem;
+}
+
+.mf-product-detail a {
+  color: white !important;
+  text-decoration: underline;
+}
+
+/*
+ * Page
+ */
+.page-header-page .entry-title {
+  background-color: black;
+  color: white;
+}
+
+.site-content {
+  background-color: black;
+}
+
+/*
+ * Footer
+ */
+.site-footer .footer-payments ul a img {
+  height: 8rem;
+  object-fit: cover;
+}
+
+/*
+ * Paid Memberships Pro
+ */
+#pmpro_account .pmpro_box h2 {
+  color: white;
+}
+
+table.pmpro_table {
+  color: white;
+}
+
+#pmpro_account a {
+  color: white;
+  text-decoration: underline;
+}

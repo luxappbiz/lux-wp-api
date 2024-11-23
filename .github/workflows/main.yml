@@ -1,0 +1,20 @@
+on:
+  push:
+    branches:    
+      - main
+
+name: Publish Child Theme
+jobs:
+  FTP-Deploy-Action:
+    name: FTP-Deploy-Action
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@main
+
+    - name: FTP-Deploy-Action
+      uses: SamKirkland/FTP-Deploy-Action@4.3.2
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        server-dir: '/market.luxoticmotors.com/public_html/wp-content/themes/lux-market-wp/'
