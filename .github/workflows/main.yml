@@ -17,4 +17,4 @@ jobs:
         server: ${{ secrets.FTP_SERVER }}
         username: ${{ secrets.FTP_USERNAME }}
         password: ${{ secrets.FTP_PASSWORD }}
-        server-dir: '/market.luxoticmotors.com/public_html/wp-content/themes/lux-market-wp/'
+        server-dir: '/luxapp.biz/public_html/wp-content/themes/lux-wp-api/'
