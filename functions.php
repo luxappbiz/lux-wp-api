@@ -10,10 +10,10 @@ add_action( 'wp_enqueue_scripts', function () {
 $template_directory = get_template_directory();
 // $get_template_directory_uri = get_template_directory_uri();
 
-require_once( $template_directory . '/../lux-market-wp/api/products.php' );
+require_once( $template_directory . '/../lux-wp-api/api/products.php' );
 
-// require_once( $template_directory . '/../lux-market-wp/api/vendors.php' );
+// require_once( $template_directory . '/../lux-wp-api/api/vendors.php' );
 
-require_once( $template_directory . '/../lux-market-wp/api/users.php' );
+require_once( $template_directory . '/../lux-wp-api/api/users.php' );
 
-require_once( $template_directory . '/../lux-market-wp/api/mobile-api.php' );
+require_once( $template_directory . '/../lux-wp-api/api/mobile-api.php' );
