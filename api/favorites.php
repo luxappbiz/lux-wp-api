@@ -1,6 +1,12 @@
 <?php
 
 add_action( 'rest_api_init', function () {
+  add_action( 'rest_pre_serve_request', function () {
+    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Wpml-Language', true );
+    header("Access-Control-Allow-Origin: *");
+    // header('Access-Control-Allow-Methods: GET, POST');
+    // header("Access-Control-Allow-Headers: X-Requested-With");
+  });
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
     'callback' => 'mobile_app_get_favourites',
