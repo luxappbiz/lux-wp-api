@@ -1,6 +1,12 @@
 <?php
 
 add_action( 'rest_api_init', function () {
+  add_action( 'rest_pre_serve_request', function () {
+    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Wpml-Language', true );
+    header("Access-Control-Allow-Origin: *");
+    // header('Access-Control-Allow-Methods: GET, POST');
+    // header("Access-Control-Allow-Headers: X-Requested-With");
+  });
   register_rest_route('lux/v1', '/register', array(
     'methods' => 'POST',
     'callback' => 'lux_api_register',
@@ -32,7 +38,8 @@ add_action( 'rest_api_init', function () {
   ));
 });
 
-function lux_api_register( WP_REST_Request $request ) {
+function lux_api_register(WP_REST_Request $request)
+{
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST');
   header("Access-Control-Allow-Headers: X-Requested-With");
@@ -45,26 +52,28 @@ function lux_api_register( WP_REST_Request $request ) {
   if (is_wp_error($user_id)) {
     wp_send_json([
       'success' => false,
-      'error'=> 'Creating new user failed. '. $user_id->get_error_message()
+      'error' => 'Creating new user failed. ' . $user_id->get_error_message()
     ]);
   }
   $user = get_user_by('ID', $user_id);
-  if (!$user || !wp_check_password( $password, $user->data->user_pass, $user->ID )) {
+  if (!$user || !wp_check_password($password, $user->data->user_pass, $user->ID)) {
     wp_send_json([
       'success' => false,
       'error' => 'Invalid Credentials'
     ]);
   }
   $generated_token = lux_generate_random_string(60);
-  $generated_token .= $user_id . $user->data->user_pass . $email.time();
+  $generated_token .= $user_id . $user->data->user_pass . $email . time();
   $generated_token = md5($generated_token);
   $user->data->user_pass = null;
   add_user_meta($user->ID, 'app_access_tokens', $generated_token);
+  $application_password = WP_Application_Passwords::create_new_application_password($user_id, array('name' => 'lux-mobile-app'));
   wp_send_json([
     'success' => true,
     'user' => $user->data,
-    'token' => $generated_token
-  ]);  
+    'token' => $generated_token,
+    'application_password' => $application_password[0]
+  ]);
 }
 
 function lux_create_unique_username_by_email($email) {
@@ -83,7 +92,8 @@ function lux_create_unique_username_by_email($email) {
   return $username;
 }
 
-function lux_api_login( WP_REST_Request $request ) {
+function lux_api_login(WP_REST_Request $request)
+{
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST');
   header("Access-Control-Allow-Headers: X-Requested-With");
@@ -92,25 +102,28 @@ function lux_api_login( WP_REST_Request $request ) {
   $login = $body['login'];
   $password = $body['password'];
   if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
-    $user = get_user_by( 'email', $login );
+    $user = get_user_by('email', $login);
   } else {
-    $user = get_user_by( 'login', $login );
+    $user = get_user_by('login', $login);
   }
-  if ( !$user || !wp_check_password( $password, $user->data->user_pass, $user->ID ) ) {
+  if (!$user || !wp_check_password($password, $user->data->user_pass, $user->ID)) {
     wp_send_json([
       'success' => false,
       'error' => 'Invalid Credentials'
     ]);
   }
   $generated_token = lux_generate_random_string(60);
-  $generated_token .= $user->ID . $user->data->user_pass . $login.time();
+  $generated_token .= $user->ID . $user->data->user_pass . $login . time();
   $generated_token = md5($generated_token);
   $user->data->user_pass = null;
   add_user_meta($user->ID, 'app_access_tokens', $generated_token);
+  $application_password = WP_Application_Passwords::create_new_application_password($user->ID, array('name' => 'lux-mobile-app'));
+
   wp_send_json([
     'success' => true,
     'user' => $user->data,
-    'token' => $generated_token
+    'token' => $generated_token,
+    'application_password' => $application_password[0]
   ]);
 }
 
