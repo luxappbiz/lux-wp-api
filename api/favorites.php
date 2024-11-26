@@ -66,7 +66,7 @@ function mobile_app_get_favourites( WP_REST_Request $request ) {
       foreach ( $gallery_image_ids as $image_id ) {
         $gallery_image_urls[] = wp_get_attachment_url( $image_id );
       }
-      $product['images'] = $gallery_image_urls;
+      $product->images = $gallery_image_urls;
       $favorites[] = $product;
     }
   }
