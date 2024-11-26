@@ -55,25 +55,20 @@ function mobile_app_get_favourites( WP_REST_Request $request ) {
   $favorites = [];
   if (!empty($favourite_products)) {
     foreach ($favourite_products as $product_id) {
-      // $product = wc_get_product($product_id)->get_data();
       $product = wc_get_product($product_id);
-      // var_dump($product_id, $product);
-      // wp_die();
       $gallery_image_ids = $product->get_gallery_image_ids();
-      $gallery_image_urls = array();
-      // if (isset($product['image_id']) && $product['image_id']) {
-        // $product['images'] = wp_get_attachment_metadata($product['image_id']);
-      // }
-      $featured_image_id = get_post_thumbnail_id( $object['id'] );
+      $gallery_image_urls = [];
+      $featured_image_id = get_post_thumbnail_id( $product_id );
       if ( $featured_image_id ) {
         $featured_image_url = wp_get_attachment_image_url( $featured_image_id, 'full' );
-        $gallery_image_urls = array($featured_image_url);
+        $gallery_image_urls[] = $featured_image_url;
       }
       foreach ( $gallery_image_ids as $image_id ) {
         $gallery_image_urls[] = wp_get_attachment_url( $image_id );
       }
-      $product->images = $gallery_image_urls;
-      $favorites[] = $product;
+      $product_data = $product->get_data();
+      $product_data['images'] = $gallery_image_urls;
+      $favorites[] = $product_data;
     }
   }
   wp_send_json([
