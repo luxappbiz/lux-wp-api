@@ -2,6 +2,34 @@
 
 // Add the custom field to the WooCommerce REST API product response
 add_action('rest_api_init', function () {
+  register_rest_field('product', 'author', [
+    'get_callback' => function ($product) {
+      $product_id = $product['id'];
+      $post = get_post($product_id);
+      $author_id = $post->post_author;
+      $author_name = get_the_author_meta('display_name', $author_id);
+      return [
+        'id' => $author_id,
+        'name' => $author_name,
+      ];
+    },
+    'schema' => [
+      'description' => __('Author of the product.'),
+      'type' => 'object',
+      'context' => ['view', 'edit'],
+      'properties' => [
+        'id' => [
+          'type' => 'integer',
+          'description' => __('Author ID.'),
+        ],
+        'name' => [
+          'type' => 'string',
+          'description' => __('Author name.'),
+        ],
+      ],
+    ],
+  ]);
+
   register_rest_field('product',
     'product',
     array(
