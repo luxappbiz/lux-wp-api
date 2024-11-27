@@ -32,7 +32,7 @@ function mobile_app_get_favourites( WP_REST_Request $request ) {
   if (!$authorization) {
     wp_send_json([
       'success' => false,
-      'error' => 'Invalid auth code',
+      'error' => 'Invalid auth code.',
     ]);
   }
   $user = get_users(array(
@@ -42,7 +42,7 @@ function mobile_app_get_favourites( WP_REST_Request $request ) {
   if (!$user) {
     wp_send_json([
       'success' => false,
-      'error' => 'Invalid auth code',
+      'error' => 'Invalid auth code.',
     ]);
   }
   $user_id = $user[0]->ID;
@@ -131,8 +131,8 @@ function mobile_app_remove_from_favourites( WP_REST_Request $request ) {
   $authorization = $request->get_header_as_array('authorization');
   if (!$authorization) {
     wp_send_json([
-      'success'=>false,
-      'error' => 'Invalid auth code',
+      'success' => false,
+      'error' => 'Invalid auth code.',
     ]);
   }
   $user = get_users(array(
@@ -141,8 +141,8 @@ function mobile_app_remove_from_favourites( WP_REST_Request $request ) {
   ));
   if (!$user) {
     wp_send_json([
-      'success'=>false,
-      'error' => 'Invalid auth code',
+      'success' => false,
+      'error' => 'Invalid auth code.',
     ]);
   }
   $body = $request->get_body();
@@ -166,9 +166,29 @@ function mobile_app_remove_from_favourites( WP_REST_Request $request ) {
     unset($favourite_products[$key]);
   }
 
+  $favorites = [];
+  if (!empty($favourite_products)) {
+    foreach ($favourite_products as $product_id) {
+      $product = wc_get_product($product_id);
+      $gallery_image_ids = $product->get_gallery_image_ids();
+      $gallery_image_urls = [];
+      $featured_image_id = get_post_thumbnail_id( $product_id );
+      if ( $featured_image_id ) {
+        $featured_image_url = wp_get_attachment_image_url( $featured_image_id, 'full' );
+        $gallery_image_urls[] = $featured_image_url;
+      }
+      foreach ( $gallery_image_ids as $image_id ) {
+        $gallery_image_urls[] = wp_get_attachment_url( $image_id );
+      }
+      $product_data = $product->get_data();
+      $product_data['images'] = $gallery_image_urls;
+      $favorites[] = $product_data;
+    }
+  }
+
   update_user_meta($user_id, 'favourite_products', json_encode($favourite_products));
   wp_send_json([
-    'success'=>true,
-    'favourite_products' => $favourite_products
+    'success' => true,
+    'favourite_products' => $favorites
   ]);
 }
