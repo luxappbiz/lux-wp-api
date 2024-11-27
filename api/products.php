@@ -145,11 +145,7 @@ function lux_create_product_with_image(WP_REST_Request $request) {
   $title = sanitize_text_field($request->get_param('title'));
   $price = sanitize_text_field($request->get_param('regular_price'));
   $image = $request->get_file_params()['thumbnail'];
-  return new WP_REST_Response([
-    'title'       => $title,
-    'price'    => $price,
-    'image' => $image,
-  ], 200);
+
   if (!$title || !$price || !$image) {
     return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
   }
