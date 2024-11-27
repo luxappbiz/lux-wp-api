@@ -90,7 +90,9 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/create-product', array(
     'methods'  => 'POST',
     'callback' => 'lux_create_product_with_image',
-    'permission_callback' => '__return_true',
+    'permission_callback' => function () {
+      return is_user_logged_in();
+    }
   ));
 });
 
