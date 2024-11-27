@@ -86,6 +86,12 @@ add_action('rest_api_init', function () {
       )
     );
   }
+
+  register_rest_route('lux/v1', '/create-product', array(
+    'methods'  => 'POST',
+    'callback' => 'lux_create_product_with_image',
+    'permission_callback' => '__return_true',
+  ));
 });
 
 add_filter( 'rest_prepare_product', function ( $response, $post, $request ) {
@@ -129,3 +135,64 @@ add_action( 'rest_api_init', function () {
   );
 } );
 */
+
+function lux_create_product_with_image(WP_REST_Request $request) {
+  // Ensure WooCommerce is active
+  if (!class_exists('WC_Product')) {
+      return new WP_Error('woocommerce_not_active', 'WooCommerce is not active', array('status' => 500));
+  }
+  // Get parameters
+  $title = sanitize_text_field($request->get_param('title'));
+  $price = sanitize_text_field($request->get_param('regular_price'));
+  $image = $request->get_file_params()['thumbnail'];
+  return new WP_REST_Response([
+    'title'       => $title,
+    'price'    => $price,
+    'image' => $image,
+  ], 200);
+  if (!$title || !$price || !$image) {
+    return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
+  }
+  // Handle image upload
+  $upload = wp_handle_upload($image, array('test_form' => false));
+  if (isset($upload['error'])) {
+    return new WP_Error('image_upload_failed', $upload['error'], array('status' => 500));
+  }
+  // Create attachment
+  $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
+  if (!$attachment_id) {
+    return new WP_Error('attachment_creation_failed', 'Failed to create attachment', array('status' => 500));
+  }
+  // Create WooCommerce product
+  $product = new WC_Product_Simple();
+  $product->set_name($title);
+  $product->set_regular_price($price);
+  $product->set_image_id($attachment_id);
+  $product_id = $product->save();
+  if (!$product_id) {
+    return new WP_Error('product_creation_failed', 'Failed to create product', array('status' => 500));
+  }
+  // Return product info
+  return new WP_REST_Response([
+    'id'       => $product_id,
+    'title'    => $title,
+    'price'    => $price,
+    'image_id' => $attachment_id,
+  ], 200);
+}
+
+function lux_create_attachment($file, $url) {
+  $filetype = wp_check_filetype($file);
+  $attachment = array(
+    'guid'           => $url,
+    'post_mime_type' => $filetype['type'],
+    'post_title'     => sanitize_file_name(basename($file)),
+    'post_content'   => '',
+    'post_status'    => 'inherit',
+  );
+  $attachment_id = wp_insert_attachment($attachment, $file);
+  require_once(ABSPATH . 'wp-admin/includes/image.php');
+  $attach_data = wp_generate_attachment_metadata($attachment_id, $file);
+  wp_update_attachment_metadata($attachment_id, $attach_data);
+  return $attachment_id;
+}
