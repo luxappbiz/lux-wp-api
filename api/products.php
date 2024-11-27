@@ -90,9 +90,6 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/create-product', array(
     'methods'  => 'POST',
     'callback' => 'lux_create_product_with_image',
-    'permission_callback' => function () {
-      return is_user_logged_in();
-    }
   ));
 });
 
@@ -139,6 +136,9 @@ add_action( 'rest_api_init', function () {
 */
 
 function lux_create_product_with_image(WP_REST_Request $request) {
+  return new WP_REST_Response([
+    'id'       => get_current_user(),
+  ], 200);
   // Ensure WooCommerce is active
   if (!class_exists('WC_Product')) {
       return new WP_Error('woocommerce_not_active', 'WooCommerce is not active', array('status' => 500));
