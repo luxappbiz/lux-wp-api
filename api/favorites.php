@@ -67,7 +67,7 @@ function mobile_app_get_favourites( WP_REST_Request $request ) {
         $gallery_image_urls[] = wp_get_attachment_url( $image_id );
       }
       $product_data = $product->get_data();
-      // $product_data['images'] = $gallery_image_urls;
+      $product_data['images'] = $gallery_image_urls;
       $favorites[] = $product_data;
     }
   }
