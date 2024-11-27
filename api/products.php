@@ -176,6 +176,7 @@ function lux_create_product_with_image(WP_REST_Request $request) {
   // Get parameters
   $title = sanitize_text_field($request->get_param('title'));
   $price = sanitize_text_field($request->get_param('regular_price'));
+  $category_id = (int)$request->get_param('category_id');
   $image = $request->get_file_params()['thumbnail'];
 
   if (!$title || !$price || !$image) {
@@ -195,6 +196,7 @@ function lux_create_product_with_image(WP_REST_Request $request) {
   $product = new WC_Product_Simple();
   $product->set_name($title);
   $product->set_regular_price($price);
+  $product->set_category_ids(array($category_id));
   $product->set_image_id($attachment_id);
   $product_id = $product->save();
   if (!$product_id) {
