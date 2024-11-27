@@ -9,21 +9,21 @@ add_action( 'rest_api_init', function () {
   });
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
-    'callback' => 'mobile_app_get_favourites',
+    'callback' => 'lux_get_favorites',
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'POST',
-    'callback' => 'mobile_app_add_to_favourites',
+    'callback' => 'lux_add_favorite',
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'DELETE',
-    'callback' => 'mobile_app_remove_from_favourites',
+    'callback' => 'lux_remove_favorite',
   ));
 });
 
-function mobile_app_get_favourites( WP_REST_Request $request ) {
+function lux_get_favorites( WP_REST_Request $request ) {
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST');
   header("Access-Control-Allow-Headers: X-Requested-With");
@@ -77,7 +77,7 @@ function mobile_app_get_favourites( WP_REST_Request $request ) {
   ]);
 }
 
-function mobile_app_add_to_favourites( WP_REST_Request $request ) {
+function lux_add_favorite( WP_REST_Request $request ) {
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST');
   header("Access-Control-Allow-Headers: X-Requested-With");
@@ -85,7 +85,7 @@ function mobile_app_add_to_favourites( WP_REST_Request $request ) {
   if (!$authorization) {
     wp_send_json([
       'success' => false,
-      'error' => 'Invalid auth code',
+      'error' => 'Invalid auth code.',
     ]);
   }
   $user = get_users(array(
@@ -95,7 +95,7 @@ function mobile_app_add_to_favourites( WP_REST_Request $request ) {
   if (!$user) {
     wp_send_json([
       'success' => false,
-      'error' => 'Invalid auth code',
+      'error' => 'Invalid auth code.',
     ]);
   }
   $data = $request->get_body();
@@ -124,7 +124,7 @@ function mobile_app_add_to_favourites( WP_REST_Request $request ) {
   ]);
 }
 
-function mobile_app_remove_from_favourites( WP_REST_Request $request ) {
+function lux_remove_favorite( WP_REST_Request $request ) {
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST');
   header("Access-Control-Allow-Headers: X-Requested-With");
@@ -145,16 +145,16 @@ function mobile_app_remove_from_favourites( WP_REST_Request $request ) {
       'error' => 'Invalid auth code.',
     ]);
   }
-  $body = $request->get_body();
-  $body = json_decode($body, true);
+  $data = $request->get_body();
+  $data = json_decode($data, true);
 
-  if (!isset($body['product_id']) || $body['product_id'] == null) {
+  if (!isset($data['product_id']) || $data['product_id'] == null) {
     wp_send_json([
       'success'=>false,
       'error' => 'Please provide product id',
     ]);
   }
-  $product_id_to_remove = $body['product_id'];
+  $product_id_to_remove = $data['product_id'];
   $user_id = $user[0]->ID;
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
