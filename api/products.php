@@ -119,6 +119,11 @@ add_action('rest_api_init', function () {
     'methods'  => 'POST',
     'callback' => 'lux_create_product_with_image',
   ));
+
+  register_rest_route('lux/v1', '/update-product', array(
+    'methods'  => 'POST',
+    'callback' => 'lux_update_product_with_image',
+  ));
 });
 
 add_filter( 'rest_prepare_product', function ( $response, $post, $request ) {
@@ -204,8 +209,7 @@ function lux_create_product_with_image(WP_REST_Request $request) {
     'id'       => $product_id,
     'title'    => $title,
     'price'    => $price,
-    'image_id' => $attachment_id,
-    'author' => get_current_user_id()
+    'image_id' => $attachment_id
   ], 200);
 }
 
@@ -223,4 +227,50 @@ function lux_create_attachment($file, $url) {
   $attach_data = wp_generate_attachment_metadata($attachment_id, $file);
   wp_update_attachment_metadata($attachment_id, $attach_data);
   return $attachment_id;
+}
+
+
+function lux_update_product_with_image(WP_REST_Request $request) {
+  // Ensure WooCommerce is active
+  if (!class_exists('WC_Product')) {
+    return new WP_Error('woocommerce_not_active', 'WooCommerce is not active', array('status' => 500));
+  }
+  // Get parameters
+  $product_id = sanitize_text_field($request->get_param('id'));
+  $title = sanitize_text_field($request->get_param('title'));
+  $price = sanitize_text_field($request->get_param('regular_price'));
+  // $image = $request->get_file_params()['thumbnail'];
+
+  // if (!$title || !$price || !$image) {
+  //   return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
+  // }
+  if (!$product_id || !$title || !$price) {
+    return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
+  }
+  // Handle image upload
+  // $upload = wp_handle_upload($image, array('test_form' => false));
+  // if (isset($upload['error'])) {
+  //   return new WP_Error('image_upload_failed', $upload['error'], array('status' => 500));
+  // }
+  // Create attachment
+  // $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
+  // if (!$attachment_id) {
+  //   return new WP_Error('attachment_creation_failed', 'Failed to create attachment', array('status' => 500));
+  // }
+  // Create WooCommerce product
+  $product = new WC_Product_Simple($product_id);
+  $product->set_name($title);
+  $product->set_regular_price($price);
+  // $product->set_image_id($attachment_id);
+  $product_id = $product->save();
+  if (!$product_id) {
+    return new WP_Error('product_creation_failed', 'Failed to create product', array('status' => 500));
+  }
+  // Return product info
+  return new WP_REST_Response([
+    'id'       => $product_id,
+    'title'    => $title,
+    'price'    => $price,
+    // 'image_id' => $attachment_id,
+  ], 200);
 }
