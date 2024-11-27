@@ -167,12 +167,17 @@ function lux_create_product_with_image(WP_REST_Request $request) {
   if (!$product_id) {
     return new WP_Error('product_creation_failed', 'Failed to create product', array('status' => 500));
   }
+  wp_update_post([
+    'ID'=>$product_id,
+    'post_author'=>get_current_user_id()
+  ]);
   // Return product info
   return new WP_REST_Response([
     'id'       => $product_id,
     'title'    => $title,
     'price'    => $price,
     'image_id' => $attachment_id,
+    'author' => get_current_user_id()
   ], 200);
 }
 
