@@ -2,10 +2,9 @@
 
 add_action( 'rest_api_init', function () {
   add_action( 'rest_pre_serve_request', function () {
-    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Wpml-Language', true );
+    header('Access-Control-Allow-Methods: GET, POST');
+    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Wpml-Language');
     header("Access-Control-Allow-Origin: *");
-    // header('Access-Control-Allow-Methods: GET, POST');
-    // header("Access-Control-Allow-Headers: X-Requested-With");
   });
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
@@ -24,28 +23,7 @@ add_action( 'rest_api_init', function () {
 });
 
 function lux_get_favorites( WP_REST_Request $request ) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
-
-  $authorization = $request->get_header_as_array('authorization');
-  if (!$authorization) {
-    wp_send_json([
-      'success' => false,
-      'error' => 'Invalid auth code.',
-    ]);
-  }
-  $user = get_users(array(
-    'meta_key' => 'app_access_tokens',
-    'meta_value' => $authorization
-  ));
-  if (!$user) {
-    wp_send_json([
-      'success' => false,
-      'error' => 'Invalid auth code.',
-    ]);
-  }
-  $user_id = $user[0]->ID;
+  $user_id = get_current_user_id();
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
     $favourite_products = [];
@@ -78,26 +56,6 @@ function lux_get_favorites( WP_REST_Request $request ) {
 }
 
 function lux_add_favorite( WP_REST_Request $request ) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
-  $authorization = $request->get_header_as_array('authorization');
-  if (!$authorization) {
-    wp_send_json([
-      'success' => false,
-      'error' => 'Invalid auth code.',
-    ]);
-  }
-  $user = get_users(array(
-    'meta_key' => 'app_access_tokens',
-    'meta_value' => $authorization
-  ));
-  if (!$user) {
-    wp_send_json([
-      'success' => false,
-      'error' => 'Invalid auth code.',
-    ]);
-  }
   $data = $request->get_body();
   $data = json_decode($data, true);
   if (!isset($data['product_id']) || $data['product_id'] == null) {
@@ -106,7 +64,7 @@ function lux_add_favorite( WP_REST_Request $request ) {
       'error' => 'Product id missing.',
     ]);
   }
-  $user_id = $user[0]->ID;
+  $user_id = get_current_user_id();
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
     $favourite_products = [];
@@ -125,26 +83,6 @@ function lux_add_favorite( WP_REST_Request $request ) {
 }
 
 function lux_remove_favorite( WP_REST_Request $request ) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
-  $authorization = $request->get_header_as_array('authorization');
-  if (!$authorization) {
-    wp_send_json([
-      'success' => false,
-      'error' => 'Invalid auth code.',
-    ]);
-  }
-  $user = get_users(array(
-    'meta_key' => 'app_access_tokens',
-    'meta_value' => $authorization
-  ));
-  if (!$user) {
-    wp_send_json([
-      'success' => false,
-      'error' => 'Invalid auth code.',
-    ]);
-  }
   $data = $request->get_body();
   $data = json_decode($data, true);
 
@@ -155,7 +93,7 @@ function lux_remove_favorite( WP_REST_Request $request ) {
     ]);
   }
   $product_id_to_remove = $data['product_id'];
-  $user_id = $user[0]->ID;
+  $user_id = get_current_user_id();
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
     $favourite_products = [];
