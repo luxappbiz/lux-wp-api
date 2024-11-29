@@ -24,11 +24,6 @@ add_action( 'rest_api_init', function () {
 
 function lux_get_favorites( WP_REST_Request $request ) {
   $user_id = get_current_user_id();
-  wp_send_json([
-    'success' => true,
-    'favourite_products' => [],
-    'get_current_user_id' => get_current_user_id()
-  ]);
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
     $favourite_products = [];
