@@ -10,26 +10,31 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/register', array(
     'methods' => 'POST',
     'callback' => 'lux_api_register',
+    'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/login', array(
     'methods' => 'POST',
     'callback' => 'lux_api_login',
+    'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/user', array(
     'methods' => 'GET',
     'callback' => 'lux_mobile_app_get_user_func',
+    'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/forgot-password', [
     'methods' => 'POST',
     'callback' => 'lux_api_handle_forgot_password',
+    'permission_callback' => '__return_true',
   ]);
 
   register_rest_route('lux/v1', '/validate-password', [
     'methods' => 'POST',
     'callback' => 'lux_api_validate_password',
+    'permission_callback' => '__return_true',
   ]);
 });
 

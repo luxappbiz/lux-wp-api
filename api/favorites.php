@@ -9,16 +9,19 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
     'callback' => 'lux_get_favorites',
+    'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'POST',
     'callback' => 'lux_add_favorite',
+    'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'DELETE',
     'callback' => 'lux_remove_favorite',
+    'permission_callback' => '__return_true',
   ));
 });
 
