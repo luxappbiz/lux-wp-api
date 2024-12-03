@@ -78,10 +78,31 @@ function lux_add_favorite( WP_REST_Request $request ) {
       array_push($favourite_products, $data['product_id']);
     }
   }
+  
+  $favorites = [];
+  if (!empty($favourite_products)) {
+    foreach ($favourite_products as $product_id) {
+      $product = wc_get_product($product_id);
+      $gallery_image_ids = $product->get_gallery_image_ids();
+      $gallery_image_urls = [];
+      $featured_image_id = get_post_thumbnail_id( $product_id );
+      if ( $featured_image_id ) {
+        $featured_image_url = wp_get_attachment_image_url( $featured_image_id, 'full' );
+        $gallery_image_urls[] = $featured_image_url;
+      }
+      foreach ( $gallery_image_ids as $image_id ) {
+        $gallery_image_urls[] = wp_get_attachment_url( $image_id );
+      }
+      $product_data = $product->get_data();
+      $product_data['images'] = $gallery_image_urls;
+      $favorites[] = $product_data;
+    }
+  }
+
   update_user_meta($user_id, 'favourite_products', json_encode($favourite_products));
   wp_send_json([
     'success' => true,
-    'favourite_products' => $favourite_products
+    'favourite_products' => $favorites
   ]);
 }
 
