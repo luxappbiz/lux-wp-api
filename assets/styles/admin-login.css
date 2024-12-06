@@ -1,0 +1,180 @@
+body {
+  display: flex;
+  background-color: black;
+  /*background-image: url(./../img/champagne-roses-skyline.jpg);*/
+  background-position: center;
+  background-size: cover;
+}
+
+body #login {
+  background-color: black;
+  padding: 1rem;
+}
+
+.login h1 a {
+  background-image: url('https://luxapp.biz/wp-content/uploads/2024/09/LUX-Bugatti.png');
+  background-image: none, url('https://luxapp.biz/wp-content/uploads/2024/09/LUX-Bugatti.png');
+  width: 180px;
+  background-size: contain;
+  background-position: center;
+}
+
+.login form {
+  background-color: transparent;
+  border: 0px;
+  padding: 0;
+  box-shadow: 0 0 0 0;
+}
+
+label {
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+input#user_login,
+input#user_pass {
+  background-color: rgba(0, 0, 0, 0.6);
+  height: 44px;
+  color: inherit;
+  padding: 8px 15px;
+  border: solid 1px white;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+}
+
+input#user_login:focus,
+input#user_pass:focus {
+  box-shadow: 0 0 0 0;
+}
+
+p.forgetmenot {
+  margin-top: 9px;
+}
+
+input#rememberme {
+  background: rgba(0, 0, 0, 0.6);
+}
+
+input#rememberme:focus {
+  border-color: #000;
+  box-shadow: 0 0 0 1px #000;
+}
+
+input#wp-submit {
+  color: #000 !important;
+  background-image: -webkit-repeating-linear-gradient(left, rgba(255, 238, 170, 0) 0%, rgba(255, 238, 170, 0) 3%, rgba(255, 238, 170, .1) 3.75%),
+  -webkit-repeating-linear-gradient(left, rgba(170, 153, 85, 0) 0%, rgba(170, 153, 85, 0) 2%, rgba(170, 153, 85, .03) 2.25%),
+  -webkit-repeating-linear-gradient(left, rgba(255, 238, 170, 0) 0%, rgba(255, 238, 170, 0) .6%, rgba(255, 238, 170, .15) 1.2%),
+  linear-gradient(180deg, #a95 0%, 
+  #fea 47%, 
+  #dc8 53%,
+  #fea 100%) !important;
+  font-family: 'Playfair Display', serif !important;
+  font-style: italic !important;
+  width: 100%;
+  height: 3.25rem;
+  font-size: 1rem;
+  border: none !important;  
+}
+
+/*
+input#wp-submit {
+  width: 100%;
+  position: relative;
+  background-color: black;
+  color: rgba(0, 0, 0, 0);
+  text-transform: capitalize;
+  border: 1px solid white;
+}
+
+input#wp-submit {
+  margin-top: 1rem;
+}
+
+input#wp-submit::before {
+  content: "";
+  filter: blur(6px);
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  z-index: -1;
+  background: linear-gradient(45deg, rgb(255, 0, 0) 0%, rgb(255, 154, 0) 10%, #FF5722 20%, #FF9800 30%, #FF5722 40%, #FF9800 50%, #FF5722 60%, #FF9800 70%, #FF5722 80%, #FF9800 90%, rgb(255, 0, 0) 100%) 0% 0% / 300% 300%;
+  border-radius: 0.25rem;
+  transition-property: opacity;
+  transition-duration: 2s;
+  z-index: 1;
+}
+
+input#wp-submit:focus::before,
+input#wp-submit:hover::before {
+  animation: BGColorAnimation 3s ease infinite;
+  opacity: 1;
+}
+
+input#wp-submit::after {
+  content: "Login";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  font-size: 1rem;
+  background-color: rgba(0, 0, 0, 0.75);
+  color: white;
+  text-shadow: 0 0 6px #FF2C00, 0 0 20px #FFAB2C;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.25rem;
+  margin: auto;
+  z-index: 2;
+}
+*/
+
+.login #backtoblog a,
+.login #nav a {
+  color: white;
+}
+
+.login .button.wp-hide-pw {
+  color: #000;
+}
+
+.login .button.wp-hide-pw:focus {
+  background: 0 0;
+  border-color: #000;
+  box-shadow: 0 0 0 1px #000;
+  outline: 2px solid transparent;
+}
+
+.login #login_error,
+.login .message,
+.login .success {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border-left: 4px solid #000;
+}
+
+a.privacy-policy-link {
+  color: white;
+}
+
+.login #nav a,
+.login #backtoblog a,
+.login #backtoblog a:hover,
+.login #nav a:hover,
+.login h1 a,
+.login h1 a:hover {
+  color: white;
+  text-decoration: underline;
+  border: none !important;
+  padding: 0.5rem !important;
+  font-size: 1rem;
+}
+
+form.admin-email-confirm-form {
+  color: white;
+}

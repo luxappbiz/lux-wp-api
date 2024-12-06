@@ -71,6 +71,18 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+  if (class_exists('acf')) {
+    register_rest_field('product',
+      'video',
+      array(
+        'get_callback' => function ( $object ) {
+          return get_field('video', $object['id'] );
+        },
+        'update_callback' => null,
+        'schema' => null,
+      )
+    );
+  }
   register_rest_field('product',
     'title_formatted',
     array(
@@ -232,7 +244,6 @@ function lux_create_attachment($file, $url) {
   wp_update_attachment_metadata($attachment_id, $attach_data);
   return $attachment_id;
 }
-
 
 function lux_update_product_with_image(WP_REST_Request $request) {
   // Ensure WooCommerce is active
