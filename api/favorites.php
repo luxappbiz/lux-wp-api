@@ -8,24 +8,24 @@ add_action( 'rest_api_init', function () {
   });
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
-    'callback' => 'lux_get_favorites',
+    'callback' => 'lux_api_get_favorites',
     'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'POST',
-    'callback' => 'lux_add_favorite',
+    'callback' => 'lux_api_add_favorite',
     'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'DELETE',
-    'callback' => 'lux_remove_favorite',
+    'callback' => 'lux_api_remove_favorite',
     'permission_callback' => '__return_true',
   ));
 });
 
-function lux_get_favorites( WP_REST_Request $request ) {
+function lux_api_get_favorites( WP_REST_Request $request ) {
   $user_id = get_current_user_id();
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
@@ -58,7 +58,7 @@ function lux_get_favorites( WP_REST_Request $request ) {
   ]);
 }
 
-function lux_add_favorite( WP_REST_Request $request ) {
+function lux_api_add_favorite( WP_REST_Request $request ) {
   $data = $request->get_body();
   $data = json_decode($data, true);
   if (!isset($data['product_id']) || $data['product_id'] == null) {
@@ -106,7 +106,7 @@ function lux_add_favorite( WP_REST_Request $request ) {
   ]);
 }
 
-function lux_remove_favorite( WP_REST_Request $request ) {
+function lux_api_remove_favorite( WP_REST_Request $request ) {
   $data = $request->get_body();
   $data = json_decode($data, true);
 

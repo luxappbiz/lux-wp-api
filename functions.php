@@ -33,3 +33,5 @@ require_once( $template_directory . '/../lux-wp-api/api/users.php' );
 require_once( $template_directory . '/../lux-wp-api/api/mobile-api.php' );
 
 require_once( $template_directory . '/../lux-wp-api/api/favorites.php' );
+
+require_once( $template_directory . '/../lux-wp-api/api/chats.php' );
