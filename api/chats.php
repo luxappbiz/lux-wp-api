@@ -8,7 +8,7 @@ add_action( 'rest_api_init', function () {
   });
   register_rest_route('lux/v1', '/chats', array(
     'methods' => 'GET',
-    'callback' => 'lux_api_get_chats',
+    'callback' => 'lux_api_get_chat_messages',
     'permission_callback' => '__return_true',
   ));
 
@@ -25,7 +25,32 @@ add_action( 'rest_api_init', function () {
   // ));
 });
 
-function lux_api_get_chats( WP_REST_Request $request ) {
+function lux_api_get_chat_messages( WP_REST_Request $request ) {
+  $data = $request->get_body();
+  $data = json_decode($data, true);
+  if (!isset($data['receiver_user_id']) || $data['receiver_user_id'] == null) {
+    wp_send_json([
+      'success' => false,
+      'error' => 'Receiver user id missing.',
+    ]);
+  }
+  global $wpdb;
+  $table = $wpdb->prefix . 'lux_chats'; 
+  $receiver_user_id = (int)$data['receiver_user_id'];
+  $sql = "SELECT * FROM $table WHERE receiver_user_id = $receiver_user_id";
+  $chat_messages = $wpdb->get_results($sql);
+  if ($chat_messages) {
+    wp_send_json([
+      'success' => true,
+      'chat_messages' => $chat_messages
+    ]);    
+  } else {
+    wp_send_json([
+      'success' => true,
+      'chat_messages' => [],
+      'error' => 'Something went wrong.'
+    ]);
+  }
 }
 
 function lux_api_add_chat_message( WP_REST_Request $request ) {
