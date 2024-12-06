@@ -14,6 +14,30 @@ add_action('admin_menu', function () {
   );
 });
 
+add_action('admin_init', function () {
+  if (get_option('lux_chats_table_created_at')) {
+    return;
+  }
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'lux_chats';
+  if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE $table_name (
+      id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      sender_user_id INT(11) UNSIGNED NOT NULL,
+      receiver_user_id INT(11) UNSIGNED NOT NULL,
+      message TEXT NOT NULL,
+      reactions JSON DEFAULT NULL,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) $charset_collate;";
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+    // $wpdb->query("ALTER TABLE $table_name ADD INDEX (sender_user_id, receiver_user_id);");
+    add_option('lux_chats_table_created_at', current_datetime()->format('Y-m-d H:i:s'));
+  }
+});
+
 function lux_admin_chats_page_content() {
   $site_url = get_site_url();
   ?>
