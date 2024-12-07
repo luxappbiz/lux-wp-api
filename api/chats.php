@@ -26,25 +26,36 @@ add_action( 'rest_api_init', function () {
 });
 
 function lux_api_get_chat_messages( WP_REST_Request $request ) {
-  $data = $request->get_body();
-  $data = json_decode($data, true);
-  if (!isset($data['receiver_user_id']) || $data['receiver_user_id'] == null) {
+  header('Access-Control-Allow-Origin: *');
+  header('Access-Control-Allow-Methods: GET');
+  header("Access-Control-Allow-Headers: X-Requested-With");
+  // $data = $request->get_body();
+  // $data = json_decode($data, true);
+  // if (!isset($data['receiver_user_id']) || $data['receiver_user_id'] == null) {
+  //   wp_send_json([
+  //     'success' => false,
+  //     'error' => 'Receiver user id missing.',
+  //   ]);
+  // }
+  // $sender_user_id = isset($data['sender_user_id']) ? (int)$data['sender_user_id'] : get_current_user_id();
+  // $sender_user_id = get_current_user_id(); // not working
+  if (!isset($_GET['sender_user_id']) || !isset($_GET['receiver_user_id'])) {
     wp_send_json([
       'success' => false,
-      'error' => 'Receiver user id missing.',
+      'error' => 'Sender & receiver user id missing.',
     ]);
   }
-  $sender_user_id = isset($data['sender_user_id']) ? (int)$data['sender_user_id'] : get_current_user_id();
-  // $sender_user_id = get_current_user_id(); // not working
   global $wpdb;
-  $table = $wpdb->prefix . 'lux_chats'; 
-  $receiver_user_id = (int)$data['receiver_user_id'];
+  $table = $wpdb->prefix . 'lux_chats';
+  $sender_user_id = (int)$_GET['sender_user_id']; // dont use
+  // $receiver_user_id = (int)$data['receiver_user_id']; // live
+  $receiver_user_id = (int)$_GET['receiver_user_id']; // dont use
   $sql = "SELECT * FROM $table WHERE sender_user_id = $sender_user_id AND receiver_user_id = $receiver_user_id";
   $chat_messages = $wpdb->get_results($sql);
   if ($chat_messages) {
     if (!empty($chat_messages)) {
       foreach($chat_messages as $key => $chat_message) {
-        $user_id = (int)$chat_messages->sender_user_id;
+        $user_id = (int)$chat_message->sender_user_id;
         $chat_message->{'first_name'} = get_user_meta($user_id, 'first_name', true);
         $chat_message->{'last_name'} = get_user_meta($user_id, 'first_name', true);
       }
