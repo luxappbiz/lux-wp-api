@@ -34,19 +34,28 @@ function lux_api_get_chat_messages( WP_REST_Request $request ) {
       'error' => 'Receiver user id missing.',
     ]);
   }
+  $sender_user_id = isset($data['sender_user_id']) ? (int)$data['sender_user_id'] : get_current_user_id();
+  // $sender_user_id = get_current_user_id(); // not working
   global $wpdb;
   $table = $wpdb->prefix . 'lux_chats'; 
   $receiver_user_id = (int)$data['receiver_user_id'];
-  $sql = "SELECT * FROM $table WHERE receiver_user_id = $receiver_user_id";
+  $sql = "SELECT * FROM $table WHERE sender_user_id = $sender_user_id AND receiver_user_id = $receiver_user_id";
   $chat_messages = $wpdb->get_results($sql);
   if ($chat_messages) {
+    if (!empty($chat_messages)) {
+      foreach($chat_messages as $key => $chat_message) {
+        $user_id = (int)$chat_messages->sender_user_id;
+        $chat_message->{'first_name'} = get_user_meta($user_id, 'first_name', true);
+        $chat_message->{'last_name'} = get_user_meta($user_id, 'first_name', true);
+      }
+    }
     wp_send_json([
       'success' => true,
       'chat_messages' => $chat_messages
     ]);    
   } else {
     wp_send_json([
-      'success' => true,
+      'success' => false,
       'chat_messages' => [],
       'error' => 'Something went wrong.'
     ]);
