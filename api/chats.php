@@ -62,9 +62,9 @@ function lux_api_get_chat_messages( WP_REST_Request $request ) {
   if ($chat_messages) {
     if (!empty($chat_messages)) {
       foreach($chat_messages as $key => $chat_message) {
-        $user_id = (int)$chat_message->sender_user_id;
-        $chat_message->{'first_name'} = get_user_meta($user_id, 'first_name', true);
-        $chat_message->{'last_name'} = get_user_meta($user_id, 'first_name', true);
+        $sender_user_id = (int)$chat_message->sender_user_id;
+        $chat_message->{'sender_first_name'} = get_user_meta($sender_user_id, 'first_name', true);
+        $chat_message->{'sender_last_name'} = get_user_meta($sender_user_id, 'last_name', true);
       }
     }
     wp_send_json([
