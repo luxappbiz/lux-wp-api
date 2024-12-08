@@ -89,12 +89,12 @@ function lux_api_add_chat_message( WP_REST_Request $request ) {
       'error' => 'Receiver user id missing.',
     ]);
   }
-  // $user_id = isset($data['sender_user_id']) ? (int)$data['sender_user_id'] : get_current_user_id();
-  $sender_user_id = get_current_user_id();
+  // $sender_user_id = isset($data['sender_user_id']) ? (int)$data['sender_user_id'] : get_current_user_id();
+  // $sender_user_id = get_current_user_id();
   global $wpdb;
-  $table_name = $wpdb->prefix . 'lux_chats';
+  $table = $wpdb->prefix . 'lux_chats';
   $data = array(
-    'sender_user_id' => $sender_user_id,
+    'sender_user_id' => $data['sender_user_id'],
     'receiver_user_id' => $data['receiver_user_id'],
     'message' => $data['message'],
     // 'reactions' => $data['reactions'], // Assuming this is already in JSON format or NULL
@@ -104,8 +104,9 @@ function lux_api_add_chat_message( WP_REST_Request $request ) {
   );
   // The format for each value in the data array
   $format = array('%d', '%d', '%s', '%s', '%s', '%s');
-  $wpdb->insert($table_name, $data, $format);
-  // Check for errors
+  $wpdb->insert($table, $data, $format);
+  // var_dump($data, $wpdb->last_query);
+  // wp_die();
   if ($wpdb->insert_id) {
     wp_send_json([
       'success' => true,
