@@ -49,20 +49,41 @@ function lux_admin_chats_page_content() {
   </style>
   <div class="wrap lux-admin-chats">
     <h1>Chats</h1>
-    <div class="wp-list-table-wrap">
-      <table class="wp-list-table widefat fixed striped">
-        <thead>
-          <tr>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <?php
+    global $wpdb;
+    $table = $wpdb->prefix . 'lux_chats';
+    $sql = "SELECT * FROM $table";
+    $chat_messages = $wpdb->get_results($sql);
+    if ($chat_messages && !empty($chat_messages)) { ?>
+      <div class="wp-list-table-wrap">
+        <table class="wp-list-table widefat fixed striped">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Sender User ID</th>
+              <th>Receiver User ID</th>
+              <th>Message</th>
+              <th>Reactions</th>
+              <th>Updated At</th>
+              <th>Created At</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach($chat_messages as $key => $chat_message) { ?>
+              <tr>
+                <td><?= $chat_message->id ?></td>
+                <td><?= $chat_message->sender_user_id ?></td>
+                <td><?= $chat_message->receiver_user_id ?></td>
+                <td><?= $chat_message->message ?></td>
+                <td><?= $chat_message->reactions ?></td>
+                <td><?= $chat_message->updated_at ?></td>
+                <td><?= $chat_message->created_at ?></td>
+              </tr>
+            <?php } ?>
+          </tbody>
+        </table>
+      </div>
+    <?php } ?>
   </div>
   <?php
 }

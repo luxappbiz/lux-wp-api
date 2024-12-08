@@ -62,12 +62,12 @@ function lux_api_get_chat_messages( WP_REST_Request $request ) {
     }
     wp_send_json([
       'success' => true,
-      'chat_messages' => $chat_messages
+      'messages' => $chat_messages
     ]);    
   } else {
     wp_send_json([
       'success' => false,
-      'chat_messages' => [],
+      'messages' => [],
       'error' => 'Something went wrong.'
     ]);
   }
@@ -102,13 +102,13 @@ function lux_api_add_chat_message( WP_REST_Request $request ) {
   if ($wpdb->insert_id) {
     wp_send_json([
       'success' => true,
-      'chat_message_id' => $wpdb->insert_id
+      'message_id' => $wpdb->insert_id
     ]);
   } else {
     error_log("Error inserting chat message: " . $wpdb->last_error);
     wp_send_json([
       'success' => false,
-      'chat_message_id' => null,
+      'message_id' => null,
       'error' => "Error inserting chat message: " . $wpdb->last_error
     ]);
   }
