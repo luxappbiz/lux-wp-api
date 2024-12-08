@@ -50,7 +50,14 @@ function lux_api_get_chat_messages( WP_REST_Request $request ) {
   $sender_user_id = (int)$_GET['sender_user_id']; // dont use
   // $receiver_user_id = (int)$data['receiver_user_id']; // live
   $receiver_user_id = (int)$_GET['receiver_user_id']; // dont use
-  $sql = "SELECT * FROM $table WHERE sender_user_id = $sender_user_id AND receiver_user_id = $receiver_user_id";
+  // $sql = "SELECT * FROM $table WHERE sender_user_id = $sender_user_id AND receiver_user_id = $receiver_user_id";
+  $sql = $wpdb->prepare(
+    "SELECT * FROM $table 
+    WHERE (sender_user_id = %d AND receiver_user_id = %d) 
+       OR (sender_user_id = %d AND receiver_user_id = %d)
+    ORDER BY created_at ASC",
+    $sender_user_id, $receiver_user_id, $receiver_user_id, $sender_user_id
+  );
   $chat_messages = $wpdb->get_results($sql);
   if ($chat_messages) {
     if (!empty($chat_messages)) {
