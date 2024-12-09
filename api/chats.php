@@ -73,9 +73,8 @@ function lux_api_get_chat_messages( WP_REST_Request $request ) {
     ]);    
   } else {
     wp_send_json([
-      'success' => false,
+      'success' => true,
       'messages' => [],
-      'error' => 'Something went wrong.'
     ]);
   }
 }
