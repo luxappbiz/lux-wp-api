@@ -52,7 +52,7 @@ function lux_admin_chats_page_content() {
     <?php
     global $wpdb;
     $table = $wpdb->prefix . 'lux_chats';
-    $sql = "SELECT * FROM $table";
+    $sql = "SELECT * FROM $table ORDER BY created_at DESC";
     $chat_messages = $wpdb->get_results($sql);
     if ($chat_messages && !empty($chat_messages)) { ?>
       <div class="wp-list-table-wrap">
@@ -71,9 +71,15 @@ function lux_admin_chats_page_content() {
           <tbody>
             <?php foreach($chat_messages as $key => $chat_message) { ?>
               <tr>
-                <td><?= $chat_message->id ?></td>
-                <td><?= $chat_message->sender_user_id ?></td>
-                <td><?= $chat_message->receiver_user_id ?></td>
+                <td>
+                  <?= $chat_message->id ?>
+                </td>
+                <td>
+                  <a href="<?= $site_url ?>/wp-admin/user-edit.php?user_id=<?= $chat_message->sender_user_id ?>"><?= $chat_message->sender_user_id ?></a>
+                </td>
+                <td>
+                  <a href="<?= $site_url ?>/wp-admin/user-edit.php?user_id=<?= $chat_message->receiver_user_id ?>"><?= $chat_message->receiver_user_id ?></a>
+                </td>
                 <td><?= $chat_message->message ?></td>
                 <td><?= $chat_message->reactions ?></td>
                 <td><?= $chat_message->updated_at ?></td>
