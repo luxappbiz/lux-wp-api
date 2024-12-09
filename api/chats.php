@@ -11,18 +11,22 @@ add_action( 'rest_api_init', function () {
     'callback' => 'lux_api_get_chat_messages',
     'permission_callback' => '__return_true',
   ));
-
   register_rest_route('lux/v1', '/chats', array(
     'methods' => 'POST',
     'callback' => 'lux_api_add_chat_message',
     'permission_callback' => '__return_true',
   ));
-
+  // To Do - Method PUT
   // register_rest_route('lux/v1', '/chats', array(
   //   'methods' => 'DELETE',
   //   'callback' => 'lux_api_delete_chat_message',
   //   'permission_callback' => '__return_true',
   // ));
+  register_rest_route( 'lux/v1', '/chats/(?P<user_id>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'lux_api_get_chats',
+    'permission_callback' => '__return_true',
+  ));
 });
 
 function lux_api_get_chat_messages( WP_REST_Request $request ) {
@@ -70,7 +74,7 @@ function lux_api_get_chat_messages( WP_REST_Request $request ) {
     wp_send_json([
       'success' => true,
       'messages' => $chat_messages
-    ]);    
+    ]);
   } else {
     wp_send_json([
       'success' => true,
@@ -123,4 +127,40 @@ function lux_api_add_chat_message( WP_REST_Request $request ) {
 
 // To do: Edit Chat Message
 function lux_api_edit_chat_message( WP_REST_Request $request ) {
+}
+
+function lux_api_get_chats( WP_REST_Request $request ) {
+  header('Access-Control-Allow-Origin: *');
+  header('Access-Control-Allow-Methods: GET');
+  header("Access-Control-Allow-Headers: X-Requested-With");
+  $user_id = intval($request['user_id']);
+  // Check if the user_id corresponds to a valid user
+  if (!get_user_by('id', $user_id)) {
+    // wp_send_json([
+    //   'success' => false,
+    //   'error' => '404 invalid user id',
+    // ]);
+    return new WP_REST_Response(array('error' => 'Invalid user ID'), 404);
+  }
+  global $wpdb;
+  $table = $wpdb->prefix . 'lux_chats';
+  $sql ="SELECT * FROM $table WHERE sender_user_id = $user_id ORDER BY created_at ASC";
+  $chats = $wpdb->get_results($sql);
+  if ($chats) {
+    // if (!empty($chats)) {
+    //   foreach($chats as $key => $chat) {
+    //     $chat->{'sender_first_name'} = get_user_meta($sender_user_id, 'first_name', true);
+    //     $chat->{'sender_last_name'} = get_user_meta($sender_user_id, 'last_name', true);
+    //   }
+    // }
+    wp_send_json([
+      'success' => true,
+      'chats' => $chats
+    ]);
+  } else {
+    wp_send_json([
+      'success' => true,
+      'chats' => [],
+    ]);
+  }
 }
