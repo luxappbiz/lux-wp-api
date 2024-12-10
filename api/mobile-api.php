@@ -45,6 +45,12 @@ function lux_api_register(WP_REST_Request $request) {
   $body = $request->get_body();
   $body = json_decode($body, true);
   $email = $body['email'];
+  if (email_exists($email)) {
+    wp_send_json([
+      'success' => false,
+      'error' => 'Email address already exists, use a different email or login.',
+    ]);
+  }
   $password = $body['password'];
   $username = lux_create_unique_username_by_email($email);
   $user_id = wp_create_user($username, $password, $email);

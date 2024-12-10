@@ -18,8 +18,3 @@ add_filter( 'login_headerurl', function () {
 add_filter( 'login_headertext', function () {
   return get_bloginfo('name'); // Replace with your desired site name
 } );
-
-// Set the 'from' email address
-add_filter( 'wp_mail_from', function ( $original_email_address ) {
-  return 'info@gnetworkclub.com';
-} );
