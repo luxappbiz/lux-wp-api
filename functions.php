@@ -19,7 +19,7 @@ $template_directory = get_template_directory();
 
 require_once( $template_directory . '/../lux-wp-api/admin/admin.php' );
 
-require_once( $template_directory . '/../lux-wp-api/admin/chats.php' );
+require_once( $template_directory . '/../lux-wp-api/admin/conversations.php' );
 
 /*
  * API
@@ -34,4 +34,4 @@ require_once( $template_directory . '/../lux-wp-api/api/mobile-api.php' );
 
 require_once( $template_directory . '/../lux-wp-api/api/favorites.php' );
 
-require_once( $template_directory . '/../lux-wp-api/api/chats.php' );
+require_once( $template_directory . '/../lux-wp-api/api/conversations.php' );
