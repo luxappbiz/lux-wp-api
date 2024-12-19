@@ -87,7 +87,7 @@ function lux_api_get_sellers( WP_REST_Request $request ) {
   wp_send_json([
     'success' => true,
     'args' => $args,
-    'members' => $members,
+    'sellers' => $members,
     'count' => $users_count,
   ]);
 }
