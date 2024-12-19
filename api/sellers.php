@@ -15,13 +15,12 @@ function lux_api_get_sellers( WP_REST_Request $request ) {
   // $page_id = 66;
   // $include = array();
   // $exclude_members = get_field('exclude_members', $page_id) ?? array();
-  $exclude_members = [];
-  $exclude = array(628, 630, 631, 632); // exclude high seas promoters
-  if (!empty($exclude_members)) {
-    foreach ($exclude_members as $user_id) {
-      $exclude[] = $user_id;
-    }
-  }
+  $exclude = (isset($_GET['exclude'])) ? explode(',', $_GET['exclude']) : [];
+  // if (!empty($exclude_members)) {
+  //   foreach ($exclude_members as $user_id) {
+  //     $exclude[] = $user_id;
+  //   }
+  // }
   $search = (isset($_GET['search'])) ? $_GET['search'] : '';
   $orderby = $orderby_filter = (isset($_GET['orderby'])) ? $_GET['orderby'] : 'registered';
   $order = (isset($_GET['order'])) ? strtoupper($_GET['order']) : 'DESC';
