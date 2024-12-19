@@ -35,3 +35,5 @@ require_once( $template_directory . '/../lux-wp-api/api/mobile-api.php' );
 require_once( $template_directory . '/../lux-wp-api/api/favorites.php' );
 
 require_once( $template_directory . '/../lux-wp-api/api/conversations.php' );
+
+require_once( $template_directory . '/../lux-wp-api/api/sellers.php' );
