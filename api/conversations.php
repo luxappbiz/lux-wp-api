@@ -89,25 +89,30 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
       $user_id = $conversation_user_data->user_id;
       $table = $wpdb->prefix . 'lux_conversations';
       $sql = "SELECT * FROM $table WHERE id = $conversation_id";
+      // Get Conversation Data
       $conversation_data = $wpdb->get_row($sql);
       if ($conversation_data) {
+        // Set Conversation Image & Name to be NOT the current user
+        $table = $wpdb->prefix . 'lux_conversation_users';
+        $sql = "SELECT * FROM $table WHERE conversation_id = $conversation_id AND user_id != $user_id";
+        $other_conversation_users_data = $wpdb->get_results($sql);
+        $other_conversation_user_id = $other_conversation_users_data[0]->user_id;
+        // todo use all conversation users to make the conversation name and the image, for now we'll just use first found
         $image_url = '';
-        $profile_avatar = get_field('profile_avatar', 'user_' . $user_id);
+        $profile_avatar = get_field('profile_avatar', 'user_' . $other_conversation_user_id);
         if ($profile_avatar) {
           $image_url = wp_get_attachment_image_url($profile_avatar, 'full');
         } else {
-          $image_url = get_avatar_url($user_id, array('size' => '512'));
+          $image_url = get_avatar_url($other_conversation_user_id, array('size' => '512'));
         }
-        $conversation_name = $conversation_data->name;
+        $conversation_name = $other_conversation_users_data[0]->name;
         if ($conversation_name == '') {
-          $conversation_name = get_user_meta($user_id, 'first_name', true) . ' ' . get_user_meta($user_id, 'last_name', true);
+          $conversation_name = get_user_meta($other_conversation_user_id, 'first_name', true) . ' ' . get_user_meta($other_conversation_user_id, 'last_name', true);
         }
         $conversations[] = array(
           'id' => $conversation_id,
           'name' => $conversation_name,
-          'image' => [
-            'url' => $image_url,
-          ],
+          'image_url' => $image_url,
           'updated_at' => $conversation_data->updated_at,
           'created_at' => $conversation_data->created_at,
         );        
