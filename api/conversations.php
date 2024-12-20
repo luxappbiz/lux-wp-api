@@ -101,7 +101,8 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
         $image_url = '';
         $profile_avatar = get_field('profile_avatar', 'user_' . $other_conversation_user_id);
         if ($profile_avatar) {
-          $image_url = wp_get_attachment_image_url($profile_avatar, 'full');
+          // $image_url = wp_get_attachment_image_url($profile_avatar, 'full');
+          $image_url = $profile_avatar['url'];
         } else {
           $image_url = get_avatar_url($other_conversation_user_id, array('size' => '512'));
         }
