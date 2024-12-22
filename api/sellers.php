@@ -68,12 +68,13 @@ function lux_api_get_sellers( WP_REST_Request $request ) {
   $members = array();
   foreach ($users as $user) {
     $image_url = '';
-    // $profile_avatar = get_field('profile_avatar', 'user_' . $user->ID);
-    // if ($profile_avatar) {
+    $profile_avatar = get_field('profile_avatar', 'user_' . $user->ID);
+    if ($profile_avatar) {
     //   $image_url = wp_get_attachment_image_url($profile_avatar, 'full');
-    // } else {
+      $image_url = $profile_avatar['url'];
+    } else {
       $image_url = get_avatar_url($user->ID, array('size' => '512'));
-    // }
+    }
     $full_name = get_user_meta($user->ID, 'first_name', true) . ' ' . get_user_meta($user->ID, 'last_name', true);
     $members[] = array(
       'id' => $user->ID,
