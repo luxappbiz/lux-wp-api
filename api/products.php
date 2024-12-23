@@ -73,6 +73,28 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+  register_rest_field(
+    'product',
+    'gallery_images_ids',
+    array(
+      'get_callback' => function ($object) {
+        $product = wc_get_product($object['id']);
+        $gallery_image_ids = $product->get_gallery_image_ids();
+        $gallery_image_urls = array();
+        $featured_image_id = get_post_thumbnail_id($object['id']);
+        if ($featured_image_id) {
+          $featured_image_url = wp_get_attachment_image_url($featured_image_id, 'full');
+          $gallery_image_urls = array($featured_image_url);
+        }
+        foreach ($gallery_image_ids as $image_id) {
+          $gallery_image_urls[wp_get_attachment_url($image_id)] = $image_id;
+        }
+        return $gallery_image_urls;
+      },
+      'update_callback' => null,
+      'schema' => null,
+    )
+  );
   if (class_exists('acf')) {
     register_rest_field(
       'product',
