@@ -106,7 +106,7 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
         } else {
           $image_url = get_avatar_url($other_conversation_user_id, array('size' => '512'));
         }
-        $conversation_name = $other_conversation_users_data[0]->name;
+        $conversation_name = $conversation_data->name;
         if ($conversation_name == '') {
           $conversation_name = get_user_meta($other_conversation_user_id, 'first_name', true) . ' ' . get_user_meta($other_conversation_user_id, 'last_name', true);
         }
