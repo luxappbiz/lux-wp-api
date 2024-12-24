@@ -239,6 +239,10 @@ function lux_create_product_with_image(WP_REST_Request $request)
   if (!$title || !$price || !$image) {
     return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
   }
+  $product = new WC_Product_Simple();
+  $product->set_name($title);
+  $product->set_regular_price($price);
+  $product->set_category_ids([$category_id]);
 
   // Handle main image upload
   $upload = wp_handle_upload($image, ['test_form' => false]);
@@ -247,9 +251,9 @@ function lux_create_product_with_image(WP_REST_Request $request)
   }
 
   $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
-  if (!$attachment_id) {
-    return new WP_Error('attachment_creation_failed', 'Failed to create attachment', ['status' => 500]);
-  }
+  if ($attachment_id) {
+    $product->set_image_id($attachment_id);
+  } 
 
   // Handle gallery images
   $galleryImageIds = [];
@@ -284,14 +288,9 @@ function lux_create_product_with_image(WP_REST_Request $request)
       }
     }
   }
+  $product->set_gallery_image_ids($galleryImageIds);
 
   // Create WooCommerce product
-  $product = new WC_Product_Simple();
-  $product->set_name($title);
-  $product->set_regular_price($price);
-  $product->set_category_ids([$category_id]);
-  $product->set_image_id($attachment_id);
-  $product->set_gallery_image_ids($galleryImageIds);
 
   $product_id = $product->save();
   if (!$product_id) {
@@ -315,7 +314,7 @@ function lux_create_product_with_image(WP_REST_Request $request)
   ], 200);
 }
 
-function lux_create_attachment($file, $url)
+function lux_create_attachment($file, $url, $post_id = null)
 {
   $filetype = wp_check_filetype($file);
   $attachment = array(
@@ -325,7 +324,7 @@ function lux_create_attachment($file, $url)
     'post_content'   => '',
     'post_status'    => 'inherit',
   );
-  $attachment_id = wp_insert_attachment($attachment, $file);
+  $attachment_id = wp_insert_attachment($attachment, $file, $post_id);
   require_once(ABSPATH . 'wp-admin/includes/image.php');
   $attach_data = wp_generate_attachment_metadata($attachment_id, $file);
   wp_update_attachment_metadata($attachment_id, $attach_data);
@@ -352,6 +351,11 @@ function lux_update_product_with_image(WP_REST_Request $request)
   if (!$product_id || !$title || !$price) {
     return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
   }
+  $product = new WC_Product_Simple($product_id);
+  $product->set_name($title);
+  $product->set_regular_price($price);
+  $product->set_category_ids([$category_id]);
+
   $fileParams = $request->get_file_params();
 
   if ($image = $fileParams['thumbnail']) {
@@ -362,13 +366,15 @@ function lux_update_product_with_image(WP_REST_Request $request)
       return new WP_Error('image_upload_failed', $upload['error'], ['status' => 500]);
     }
   
-    $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
+    $attachment_id = lux_create_attachment($upload['file'], $upload['url'], $product_id);
     if (!$attachment_id) {
       return new WP_Error('attachment_creation_failed', 'Failed to create attachment', ['status' => 500]);
+    } else {
+      $product->set_image_id($attachment_id);
+
     }
   }
 
-$product = new WC_Product_Simple($product_id);
 
 // Handle gallery images
 $galleryImageIds = $product->get_gallery_image_ids();
@@ -399,7 +405,7 @@ if (!empty($gallery_images)) {
     $upload_gallery = wp_handle_upload($file, ['test_form' => false]);
 
       if (!isset($upload_gallery['error'])) {
-        $gallery_attachment_id = lux_create_attachment($upload_gallery['file'], $upload_gallery['url']);
+        $gallery_attachment_id = lux_create_attachment($upload_gallery['file'], $upload_gallery['url'], $product_id);
         if ($gallery_attachment_id) {
           $galleryImageIds[] = $gallery_attachment_id;
         }
@@ -410,13 +416,8 @@ if (!empty($gallery_images)) {
   }
 
   // Create WooCommerce product
-  $product->set_name($title);
-  $product->set_regular_price($price);
-  $product->set_category_ids([$category_id]);
   $product->set_gallery_image_ids($galleryImageIds);
 
-
-  // $product->set_image_id($attachment_id);
   $product_id = $product->save();
   if (!$product_id) {
     return new WP_Error('product_creation_failed', 'Failed to create product', array('status' => 500));
