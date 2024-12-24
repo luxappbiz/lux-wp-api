@@ -51,6 +51,7 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+
   register_rest_field(
     'product',
     'images',
@@ -73,6 +74,7 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+
   register_rest_field(
     'product',
     'images_ids',
@@ -95,6 +97,7 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+
   if (class_exists('acf')) {
     register_rest_field(
       'product',
@@ -108,6 +111,7 @@ add_action('rest_api_init', function () {
       )
     );
   }
+
   register_rest_field(
     'product',
     'title_formatted',
@@ -121,6 +125,7 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+
   register_rest_field(
     'product',
     'excerpt_unformatted',
@@ -137,6 +142,7 @@ add_action('rest_api_init', function () {
       'schema' => null,
     )
   );
+
   if (function_exists('dokan_get_vendor_by_product')) {
     register_rest_field(
       'product',
@@ -336,6 +342,8 @@ function lux_update_product_with_image(WP_REST_Request $request)
   $product_id = sanitize_text_field($request->get_param('id'));
   $title = sanitize_text_field($request->get_param('title'));
   $price = sanitize_text_field($request->get_param('regular_price'));
+  $category_id = (int)(sanitize_text_field($request->get_param('category_id')) ?: 1);
+  
   // $image = $request->get_file_params()['thumbnail'];
 
   // if (!$title || !$price || !$image) {
@@ -344,20 +352,68 @@ function lux_update_product_with_image(WP_REST_Request $request)
   if (!$product_id || !$title || !$price) {
     return new WP_Error('missing_params', 'Missing required parameters: title, price, or image', array('status' => 400));
   }
-  // Handle image upload
-  // $upload = wp_handle_upload($image, array('test_form' => false));
-  // if (isset($upload['error'])) {
-  //   return new WP_Error('image_upload_failed', $upload['error'], array('status' => 500));
-  // }
-  // Create attachment
-  // $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
-  // if (!$attachment_id) {
-  //   return new WP_Error('attachment_creation_failed', 'Failed to create attachment', array('status' => 500));
-  // }
+  $fileParams = $request->get_file_params();
+
+  $image = $fileParams['thumbnail'];
+  $gallery_images = isset($fileParams['gallery_images']) ? $fileParams['gallery_images'] : [];
+
+// Handle main image upload
+$upload = wp_handle_upload($image, ['test_form' => false]);
+if (isset($upload['error'])) {
+  return new WP_Error('image_upload_failed', $upload['error'], ['status' => 500]);
+}
+
+$attachment_id = lux_create_attachment($upload['file'], $upload['url']);
+if (!$attachment_id) {
+  return new WP_Error('attachment_creation_failed', 'Failed to create attachment', ['status' => 500]);
+}
+$product = new WC_Product_Simple($product_id);
+
+// Handle gallery images
+$galleryImageIds = $product->get_gallery_image_ids();
+
+foreach ($request->get_param('deleted_gallery_image_ids') as $deleted_gallery_image_id) {
+  if (($key = array_search($deleted_gallery_image_id, $galleryImageIds)) !== false) {
+    wp_delete_attachment($deleted_gallery_image_id);
+    unset($galleryImageIds[$key]);
+  }
+}
+
+$galleryImageIdsError = [];
+
+if (!empty($gallery_images)) {
+  // Iterate over the files
+  foreach ($gallery_images['name'] as $index => $name) {
+    // Create a single file array for wp_handle_upload
+    $file = [
+      'name'     => $gallery_images['name'][$index],
+      'type'     => $gallery_images['type'][$index],
+      'tmp_name' => $gallery_images['tmp_name'][$index],
+      'error'    => $gallery_images['error'][$index],
+      'size'     => $gallery_images['size'][$index],
+    ];
+
+    // Process each file
+    $upload_gallery = wp_handle_upload($file, ['test_form' => false]);
+
+      if (!isset($upload_gallery['error'])) {
+        $gallery_attachment_id = lux_create_attachment($upload_gallery['file'], $upload_gallery['url']);
+        if ($gallery_attachment_id) {
+          $galleryImageIds[] = $gallery_attachment_id;
+        }
+      } else {
+        $galleryImageIdsError[] = $upload_gallery['error'];
+      }
+    }
+  }
+
   // Create WooCommerce product
-  $product = new WC_Product_Simple($product_id);
   $product->set_name($title);
   $product->set_regular_price($price);
+  $product->set_category_ids([$category_id]);
+  $product->set_gallery_image_ids($galleryImageIds);
+
+
   // $product->set_image_id($attachment_id);
   $product_id = $product->save();
   if (!$product_id) {
