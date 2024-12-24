@@ -68,7 +68,7 @@ add_action('admin_menu', function () {
     'Conversations',    // Page title
     'Conversations',    // Menu title
     'manage_options',      // Capability required
-    'chats',      // Menu slug
+    'messages',      // Menu slug
     'lux_admin_conversations_page_content',
     'dashicons-admin-comments',
     6 // Position in the menu
@@ -104,8 +104,8 @@ function lux_admin_conversations_page_content() {
     ?>
     <div class="wrap lux-admin-conversations">
       <div class="nav-tab-wrapper">
-        <a href="<?= $site_url ?>/wp-admin/admin.php?page=conversations&tab=conversations" class="nav-tab <?= $active_tab === 'conversations' ? 'nav-tab-active' : '' ?>">Conversations</a>
-        <a href="<?= $site_url ?>/wp-admin/admin.php?page=conversations&tab=messages" class="nav-tab <?= $active_tab === 'messages' ? 'nav-tab-active' : '' ?>">Messages</a>
+        <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=conversations" class="nav-tab <?= $active_tab === 'conversations' ? 'nav-tab-active' : '' ?>">Conversations</a>
+        <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=messages" class="nav-tab <?= $active_tab === 'messages' ? 'nav-tab-active' : '' ?>">Messages</a>
       </div>    
       <?php
       if ($active_tab === 'conversations') { ?>

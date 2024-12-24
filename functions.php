@@ -19,7 +19,7 @@ $template_directory = get_template_directory();
 
 require_once( $template_directory . '/../lux-wp-api/admin/admin.php' );
 
-require_once( $template_directory . '/../lux-wp-api/admin/conversations.php' );
+require_once( $template_directory . '/../lux-wp-api/admin/messages.php' );
 
 /*
  * API
