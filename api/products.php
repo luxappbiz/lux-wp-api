@@ -354,19 +354,20 @@ function lux_update_product_with_image(WP_REST_Request $request)
   }
   $fileParams = $request->get_file_params();
 
-  $image = $fileParams['thumbnail'];
-  $gallery_images = isset($fileParams['gallery_images']) ? $fileParams['gallery_images'] : [];
+  if ($image = $fileParams['thumbnail']) {
 
-// Handle main image upload
-$upload = wp_handle_upload($image, ['test_form' => false]);
-if (isset($upload['error'])) {
-  return new WP_Error('image_upload_failed', $upload['error'], ['status' => 500]);
-}
+    // Handle main image upload
+    $upload = wp_handle_upload($image, ['test_form' => false]);
+    if (isset($upload['error'])) {
+      return new WP_Error('image_upload_failed', $upload['error'], ['status' => 500]);
+    }
+  
+    $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
+    if (!$attachment_id) {
+      return new WP_Error('attachment_creation_failed', 'Failed to create attachment', ['status' => 500]);
+    }
+  }
 
-$attachment_id = lux_create_attachment($upload['file'], $upload['url']);
-if (!$attachment_id) {
-  return new WP_Error('attachment_creation_failed', 'Failed to create attachment', ['status' => 500]);
-}
 $product = new WC_Product_Simple($product_id);
 
 // Handle gallery images
@@ -381,6 +382,7 @@ foreach ($request->get_param('deleted_gallery_image_ids') as $deleted_gallery_im
 
 $galleryImageIdsError = [];
 
+$gallery_images = isset($fileParams['gallery_images']) ? $fileParams['gallery_images'] : [];
 if (!empty($gallery_images)) {
   // Iterate over the files
   foreach ($gallery_images['name'] as $index => $name) {
