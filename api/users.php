@@ -5,7 +5,7 @@ add_action('rest_api_init', function () {
     'user',
     'info',
     array(
-      'get_callback'    => function ($object, $field_name, $request) {
+      'get_callback' => function ($object, $field_name, $request) {
         $user_id = (int)$object['id'];
         $user = get_user_by('ID', $user_id);
         $banner_image = '';
@@ -38,7 +38,7 @@ add_action('rest_api_init', function () {
     'user', // Object type: this is the user endpoint.
     'products', // Name of the custom field.
     array(
-      'get_callback'    => function ($object, $field_name, $request) {
+      'get_callback' => function ($object, $field_name, $request) {
         $user_id = $object['id'];
         // Example: Get products associated with this user, assuming you have a custom way to link products to users.
         // Modify this query based on your specific setup.
@@ -91,3 +91,11 @@ add_filter( 'rest_prepare_user', function ( $response, $post, $request ) {
   return $response;
 }, 10, 3 );
 */
+
+function update_user_info($value, $user, $field_name) {
+  if (!current_user_can('edit_user', $user->ID)) {
+    return new WP_Error('rest_forbidden', esc_html__('You cannot update the user info.', 'text-domain'), ['status' => 403]);
+  }
+  
+  return update_user_meta($user->ID, $field_name, sanitize_text_field($value)); // Update the custom meta field.
+}
