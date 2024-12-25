@@ -91,11 +91,3 @@ add_filter( 'rest_prepare_user', function ( $response, $post, $request ) {
   return $response;
 }, 10, 3 );
 */
-
-function update_user_info($value, $user, $field_name) {
-  if (!current_user_can('edit_user', $user->ID)) {
-    return new WP_Error('rest_forbidden', esc_html__('You cannot update the user info.', 'text-domain'), ['status' => 403]);
-  }
-  
-  return update_user_meta($user->ID, $field_name, sanitize_text_field($value)); // Update the custom meta field.
-}
