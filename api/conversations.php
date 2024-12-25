@@ -116,11 +116,19 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
           'image_url' => $image_url,
           'updated_at' => $conversation_data->updated_at,
           'created_at' => $conversation_data->created_at,
-        );        
+        );
       }
     }
   }
+  $sort = 'asc';
+  // Sort the $conversations array by the 'updated_at' field
+  usort($conversations, function($a, $b) {
+    $timestamp_a = strtotime($a['updated_at']);
+    $timestamp_b = strtotime($b['updated_at']);
+    return $sort == 'asc' ? $timestamp_a - $timestamp_b : $timestamp_b - $timestamp_a; // Ascending order, change to $timestampB - $timestampA for descending
+  });
   return new WP_REST_Response(array(
+    'sort' => $sort,
     'conversations' => $conversations, 
   ), 201);
 }
