@@ -5,7 +5,7 @@ add_action('rest_api_init', function () {
     'user',
     'info',
     array(
-      'get_callback'    => function ($object, $field_name, $request) {
+      'get_callback' => function ($object, $field_name, $request) {
         $user_id = (int)$object['id'];
         $user = get_user_by('ID', $user_id);
         $banner_image = '';
@@ -38,7 +38,7 @@ add_action('rest_api_init', function () {
     'user', // Object type: this is the user endpoint.
     'products', // Name of the custom field.
     array(
-      'get_callback'    => function ($object, $field_name, $request) {
+      'get_callback' => function ($object, $field_name, $request) {
         $user_id = $object['id'];
         // Example: Get products associated with this user, assuming you have a custom way to link products to users.
         // Modify this query based on your specific setup.

@@ -25,6 +25,12 @@ add_action( 'rest_api_init', function () {
     'permission_callback' => '__return_true',
   ));
 
+  register_rest_route('lux/v1', '/user', array(
+    'methods' => 'POST',
+    'callback' => 'lux_mobile_app_update_user_func',
+    'permission_callback' => '__return_true',
+  ));
+
   register_rest_route('lux/v1', '/forgot-password', [
     'methods' => 'POST',
     'callback' => 'lux_api_handle_forgot_password',
@@ -168,6 +174,81 @@ function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
     'success'=>true,
     'user' => $user[0]->data
   ]);
+}
+
+function lux_mobile_app_update_user_func(WP_REST_Request $request)
+{
+  $user_id  = get_current_user_id();
+  $new_display_name = sanitize_text_field($request->get_param('display_name'));
+  $media_id = null;
+
+  if (! $user_id) {
+    return new WP_Error('mpp_no_user', __('User not found.', ''), array('status' => 403));
+  }
+
+  if (! current_user_can('upload_files', $user_id)) {
+    return new WP_Error('mpp_insufficient_privs', __('You must be able to upload files.', ''), array('status' => 403));
+  }
+
+  $fileParams = $request->get_file_params();
+  $post_id = get_media_post_id($user_id);
+
+  // Save user meta.
+  update_user_option($user_id, 'metronet_post_id', $post_id);
+  if ($image = $fileParams['profile_image']) {
+    $upload = wp_handle_upload($image, ['test_form' => false]);
+    if (isset($upload['error'])) {
+      return new WP_Error('image_upload_failed', $upload['error'], ['status' => 500]);
+    }
+    $media_id = lux_create_attachment($upload['file'], $upload['url'], $post_id);
+  }
+
+  update_user_option($user_id, 'metronet_image_id', $media_id);
+  set_post_thumbnail($post_id, $media_id);
+  $user_data = [
+    'ID' => $user_id,
+    'display_name' => $new_display_name,
+  ];
+
+  // Update the user
+  $result = wp_update_user($user_data);
+
+  if (is_wp_error($result)) {
+    wp_send_json([
+      'success'=>false,
+      'error'=>$result
+    ]);
+  }
+  wp_send_json([
+    'success'=>true,
+  ]);
+}
+
+ function get_media_post_id( $user_id = 0 ) {
+
+  $user = get_user_by( 'id', $user_id );
+
+  // Get/Create Profile Picture Post.
+  $post_args = array(
+      'post_type'   => 'mt_pp',
+      'author'      => $user_id,
+      'post_status' => 'publish',
+  );
+  $posts     = get_posts( $post_args );
+  if ( ! $posts ) {
+      $post_id = wp_insert_post(
+          array(
+              'post_author' => $user_id,
+              'post_type'   => 'mt_pp',
+              'post_status' => 'publish',
+              'post_title'  => $user->data->display_name,
+          )
+      );
+  } else {
+      $post    = end( $posts );
+      $post_id = $post->ID;
+  }
+  return $post_id;
 }
 
 function lux_api_handle_forgot_password(WP_REST_Request $request) {

@@ -314,23 +314,6 @@ function lux_create_product_with_image(WP_REST_Request $request)
   ], 200);
 }
 
-function lux_create_attachment($file, $url, $post_id = null)
-{
-  $filetype = wp_check_filetype($file);
-  $attachment = array(
-    'guid'           => $url,
-    'post_mime_type' => $filetype['type'],
-    'post_title'     => sanitize_file_name(basename($file)),
-    'post_content'   => '',
-    'post_status'    => 'inherit',
-  );
-  $attachment_id = wp_insert_attachment($attachment, $file, $post_id);
-  require_once(ABSPATH . 'wp-admin/includes/image.php');
-  $attach_data = wp_generate_attachment_metadata($attachment_id, $file);
-  wp_update_attachment_metadata($attachment_id, $attach_data);
-  return $attachment_id;
-}
-
 function lux_update_product_with_image(WP_REST_Request $request)
 {
   // Ensure WooCommerce is active
