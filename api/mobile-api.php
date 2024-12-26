@@ -66,6 +66,10 @@ function lux_api_register(WP_REST_Request $request) {
       'error' => 'Creating new user failed. ' . $user_id->get_error_message()
     ]);
   }
+  
+  $user = new WP_User($user_id);
+  $user->set_role('customer');
+
   $user = get_user_by('ID', $user_id);
   if (!$user || !wp_check_password($password, $user->data->user_pass, $user->ID)) {
     wp_send_json([
