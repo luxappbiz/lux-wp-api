@@ -413,3 +413,14 @@ if (!empty($gallery_images)) {
     // 'image_id' => $attachment_id,
   ], 200);
 }
+
+add_filter('woocommerce_rest_check_permissions', function ($permission, $context, $object_id, $post_type) {
+  // Check if the post type is 'product' and the context is 'read'
+  if ($post_type === 'product' && $context === 'read') {
+    // Allow 'customer' role to access published products
+    if (current_user_can('customer')) {
+      return true;
+    }
+  }
+  return $permission;
+}, 10, 4);
