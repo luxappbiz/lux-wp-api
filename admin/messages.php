@@ -65,10 +65,10 @@ add_action('admin_init', function () {
 
 add_action('admin_menu', function () {
   add_menu_page(
-    'Conversations',    // Page title
-    'Conversations',    // Menu title
-    'manage_options',      // Capability required
-    'messages',      // Menu slug
+    'Conversations',
+    'Conversations',
+    'manage_options',
+    'messages',
     'lux_admin_conversations_page_content',
     'dashicons-admin-comments',
     6 // Position in the menu
@@ -106,13 +106,13 @@ function lux_admin_conversations_page_content() {
       <div class="nav-tab-wrapper">
         <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=conversations" class="nav-tab <?= $active_tab === 'conversations' ? 'nav-tab-active' : '' ?>">Conversations</a>
         <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=messages" class="nav-tab <?= $active_tab === 'messages' ? 'nav-tab-active' : '' ?>">Messages</a>
-      </div>    
+      </div>
       <?php
       if ($active_tab === 'conversations') { ?>
         <h1>Conversations</h1>
         <?php
         $table = $wpdb->prefix . 'lux_conversations';
-        $sql = "SELECT * FROM $table ORDER BY created_at ASC";
+        $sql = "SELECT * FROM $table ORDER BY updated_at DESC";
         $conversations = $wpdb->get_results($sql);
         if ($conversations && !empty($conversations)) { ?>
           <div class="wp-list-table-wrap">
@@ -130,8 +130,8 @@ function lux_admin_conversations_page_content() {
                 <?php foreach($conversations as $key => $conversation) { ?>
                   <tr>
                     <td>
-                      <a href="<?= $site_url ?>/wp-admin/admin.php?page=conversations&conversation_id=<?= $conversation->id ?>">
-                        <?= $conversation->id ?>           
+                      <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&conversation_id=<?= $conversation->id ?>">
+                        <?= $conversation->id ?>
                       </a>
                     </td>
                     <td>
@@ -150,7 +150,7 @@ function lux_admin_conversations_page_content() {
         <h1>Messages</h1>
         <?php
         $table = $wpdb->prefix . 'lux_messages';
-        $sql = "SELECT * FROM $table ORDER BY created_at ASC";
+        $sql = "SELECT * FROM $table ORDER BY created_at DESC";
         $messages = $wpdb->get_results($sql);
         if ($messages && !empty($messages)) { ?>
           <div class="wp-list-table-wrap">
@@ -171,7 +171,11 @@ function lux_admin_conversations_page_content() {
                 <?php foreach($messages as $key => $message) { ?>
                   <tr>
                     <td><?= $message->id ?></td>
-                    <td><?= $message->conversation_id ?></td>
+                    <td>
+                      <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&conversation_id=<?= $conversation->id ?>">
+                        <?= $message->conversation_id ?>
+                      </a>
+                    </td>
                     <td>
                       <a href="<?= $$site_url . '/wp-admin/user-edit.php?user_id=' . $message->user_id ?>"><?= $message->user_id ?></a>
                     </td>

@@ -198,23 +198,39 @@ function lux_api_create_conversation_message( WP_REST_Request $request ) {
   $message = $request->get_param('message');
   global $wpdb;
   // Check if the conversation exists
-  $table = $wpdb->prefix . 'lux_conversations';
-  $conversation_exists = $wpdb->get_var("SELECT id FROM $table WHERE id = $conversation_id");
+  $table_conversations = $wpdb->prefix . 'lux_conversations';
+  $conversation_exists = $wpdb->get_var("SELECT id FROM $table_conversations WHERE id = $conversation_id");
   if (!$conversation_exists) {
     return new WP_REST_Response(array(
       'error' => $wpdb->last_error,
       'message' => 'Conversation not found.'
     ), 404);
   }
-  $table = $wpdb->prefix . 'lux_messages';
+  $table_messages = $wpdb->prefix . 'lux_messages';
   $data = array(
     'conversation_id' => $conversation_id,
     'user_id' => $user_id,
     'message' => $message,
   );
-  $success = $wpdb->insert($table, $data);
+  $success = $wpdb->insert($table_messages, $data);
   if ($success) {
     $message_id = $wpdb->insert_id;
+    // Update Conversation updated_at
+    $result = $wpdb->update(
+      $table_conversations,
+      array(
+        'updated_at' => current_time('mysql'), // Column and value to update
+      ),
+      array(
+        'id' => $conversation_id // Where clause
+      ),
+      array(
+        '%s' // Format for updated_at (string)
+      ),
+      array(
+        '%d' // Format for id (integer)
+      )
+    );
     return new WP_REST_Response(array(
       'message_id' => $message_id,
       'message' => 'Conversation message created success.'
