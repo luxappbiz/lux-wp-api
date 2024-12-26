@@ -4,7 +4,10 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/sellers', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_sellers',
-    'permission_callback' => '__return_true'
+    // 'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
 });
 

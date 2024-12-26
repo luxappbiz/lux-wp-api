@@ -4,7 +4,10 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/conversations', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_conversations',
-    'permission_callback' => '__return_true'
+    // 'permission_callback' => '__return_true'
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
   /**
    * Register the REST API route for creating a new conversation.
