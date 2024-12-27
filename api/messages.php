@@ -57,6 +57,9 @@ add_action('rest_api_init', function () {
     'methods' => 'PUT',
     'callback' => 'lux_api_update_conversation_message',
     'permission_callback' => '__return_true',
+    // 'permission_callback' => function($request) {
+    //   return is_user_logged_in();
+    // },
     'args' => array(
       'conversation_id' => array(
         'validate_callback' => function($param, $request, $key) {
@@ -312,10 +315,28 @@ function lux_api_update_conversation_message( WP_REST_Request $request ) {
     ), 404);
   }
   // Check if the message exists in the specified conversation
+  $message = $request->get_param('message');
+  $reactions = $request->get_param('reactions');
   // Update the message
+  global $wpdb;
+  $table_messages = $wpdb->prefix . 'lux_messages';
+  $result = $wpdb->update(
+    $table_messages,
+    array(
+      'message' => esc_sql($message),
+      'reactions' => esc_sql($reactions),
+    ),
+    array(
+      'id' => intval($message_id) // Where clause
+    ),
+    array('%s','%s'),
+    array('%d')
+  );
   // Return response message
   return new WP_REST_Response(array(
-    'message' => 'To do: under construction',
+    'last_query' => $wpdb->last_query,
+    'result' => $result,
+    'message' => 'Updated message',
     'message_id' => $message_id
   ), 200);
 }

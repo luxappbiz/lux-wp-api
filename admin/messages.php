@@ -52,7 +52,7 @@ add_action('admin_init', function () {
       user_id INT(11) UNSIGNED NOT NULL,
       message TEXT NOT NULL,
       attachment_id INT(11) UNSIGNED NOT NULL,
-      reactions JSON DEFAULT NULL,
+      reactions TEXT DEFAULT NULL,
       read_at DATETIME DEFAULT NULL,
       deleted_at DATETIME DEFAULT NULL,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -173,7 +173,7 @@ function lux_admin_conversations_page_content() {
                   <tr>
                     <td><?= $message->id ?></td>
                     <td>
-                      <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&conversation_id=<?= $conversation->id ?>">
+                      <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&conversation_id=<?= $message->conversation_id ?>">
                         <?= $message->conversation_id ?>
                       </a>
                     </td>
