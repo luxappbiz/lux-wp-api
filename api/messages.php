@@ -347,7 +347,7 @@ function lux_api_delete_conversation_message( WP_REST_Request $request ) {
   //   'conversation_id' => $conversation_id
   // ), array('%d', '%d'));
   return new WP_REST_Response(array(
-    'message_id' => $message_id
+    'message_id' => $message_id,
     'deleted' => $deleted,
   ), 200);
 }
