@@ -259,6 +259,14 @@ function lux_api_create_conversation_message( WP_REST_Request $request ) {
         '%d' // Format for id (integer)
       )
     );
+    // Create Message Read (Unread) Record
+    $table_messages_read = $wpdb->prefix . 'lux_messages_read';
+    $data = array(
+      'conversation_id' => $conversation_id,
+      'message_id' => $message_id,
+      'user_id' => $user_id,
+    );
+    $success = $wpdb->insert($table_messages_read, $data);
     return new WP_REST_Response(array(
       'message_id' => $message_id,
       'message' => 'Conversation message created success.'

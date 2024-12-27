@@ -13,7 +13,7 @@ add_action('admin_init', function () {
       id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
       owner_user_id INT(11) UNSIGNED NOT NULL,
       name TEXT NOT NULL,
-      deleted_at DATETIME DEFAULT NULL,
+      deleted_at TIMESTAMP DEFAULT NULL,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) $charset_collate;";
@@ -53,14 +53,31 @@ add_action('admin_init', function () {
       message TEXT NOT NULL,
       attachment_id INT(11) UNSIGNED NOT NULL,
       reactions TEXT DEFAULT NULL,
-      read_at DATETIME DEFAULT NULL,
-      deleted_at DATETIME DEFAULT NULL,
+      deleted_at TIMESTAMP DEFAULT NULL,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     ) $charset_collate;";
     require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
     dbDelta($sql);
     add_option('lux_messages_table_created_at', $current_datetime);
+  }
+  if (get_option('lux_messages_read_table_created_at')) {
+    return;
+  }
+  global $wpdb;
+  $table_name = $wpdb->prefix . 'lux_messages_read';
+  if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+    $charset_collate = $wpdb->get_charset_collate();
+    $sql = "CREATE TABLE $table_name (
+      id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      conversation_id INT(11) UNSIGNED NOT NULL,
+      message_id INT(11) UNSIGNED NOT NULL,
+      user_id INT(11) UNSIGNED NOT NULL,
+      read_at TIMESTAMP DEFAULT NULL
+    ) $charset_collate;";
+    require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+    dbDelta($sql);
+    add_option('lux_messages_read_table_created_at', $current_datetime);
   }
 });
 
@@ -78,37 +95,37 @@ add_action('admin_menu', function () {
 
 function lux_admin_conversations_page_content() {
   $site_url = get_site_url();
-  global $wpdb;
-  $conversation_id = isset($_GET['conversation_id']) ? $_GET['conversation_id'] : false;
-  if ($conversation_id) {
-    $table = $wpdb->prefix . 'lux_messages';
-    $sql = "SELECT * FROM $table WHERE conversation_id = $conversation_id ORDER BY created_at ASC";
-    $messages = $wpdb->get_results($sql);
-    ?>
-    <div class="wrap">
-      <h1>Conversation <?= $conversation_id ?> Messages</h1>
-      <?php if ($messages) { ?>
-        <ul>
-          <?php foreach ($messages as $message) {
-            $first_name = get_user_meta($message->user_id, 'first_name', true);
-            ?>
-            <li>"<?= $message->message ?>" sent by <?= $first_name ?> on <?= $message->created_at ?></li>
-          <?php } ?>
-        </ul>
-      <?php } else { ?>
-        <p>No messages.</p>
-      <?php } ?>
+  $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'conversations';
+  ?>
+  <div class="wrap lux-admin-conversations">
+    <div class="nav-tab-wrapper">
+      <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=conversations" class="nav-tab <?= $active_tab === 'conversations' ? 'nav-tab-active' : '' ?>">Conversations</a>
+      <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=messages" class="nav-tab <?= $active_tab === 'messages' ? 'nav-tab-active' : '' ?>">Messages</a>
     </div>
     <?php
-  } else {
-    $active_tab = isset($_GET['tab']) ? $_GET['tab'] : 'conversations';
-    ?>
-    <div class="wrap lux-admin-conversations">
-      <div class="nav-tab-wrapper">
-        <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=conversations" class="nav-tab <?= $active_tab === 'conversations' ? 'nav-tab-active' : '' ?>">Conversations</a>
-        <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&tab=messages" class="nav-tab <?= $active_tab === 'messages' ? 'nav-tab-active' : '' ?>">Messages</a>
+    global $wpdb;
+    $conversation_id = isset($_GET['conversation_id']) ? $_GET['conversation_id'] : false;
+    if ($conversation_id) {
+      $table = $wpdb->prefix . 'lux_messages';
+      $sql = "SELECT * FROM $table WHERE conversation_id = $conversation_id ORDER BY created_at ASC";
+      $messages = $wpdb->get_results($sql);
+      ?>
+      <div class="wrap">
+        <h1>Conversation <?= $conversation_id ?> Messages</h1>
+        <?php if ($messages) { ?>
+          <ul>
+            <?php foreach ($messages as $message) {
+              $first_name = get_user_meta($message->user_id, 'first_name', true);
+              ?>
+              <li>"<?= $message->message ?>" sent by <?= $first_name ?> on <?= $message->created_at ?></li>
+            <?php } ?>
+          </ul>
+        <?php } else { ?>
+          <p>No messages.</p>
+        <?php } ?>
       </div>
       <?php
+    } else {
       if ($active_tab === 'conversations') { ?>
         <h1>Conversations</h1>
         <?php
@@ -191,7 +208,8 @@ function lux_admin_conversations_page_content() {
             </table>
           </div>
         <?php }
-      } ?>
-    </div>
-  <?php }
-}
+      }
+    }
+    ?>
+  </div>
+<?php }
