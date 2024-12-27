@@ -56,10 +56,10 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/conversations/(?P<conversation_id>\d+)/messages/(?P<message_id>\d+)', array(
     'methods' => 'PUT',
     'callback' => 'lux_api_update_conversation_message',
-    'permission_callback' => '__return_true',
-    // 'permission_callback' => function($request) {
-    //   return is_user_logged_in();
-    // },
+    // 'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
     'args' => array(
       'conversation_id' => array(
         'validate_callback' => function($param, $request, $key) {
