@@ -73,6 +73,7 @@ add_action('rest_api_init', function () {
             'price' => $wc_product->get_price(),
             // 'regular_price' => $wc_product->get_regular_price(),
             'sale_price' => $wc_product->get_sale_price(),
+            'stock_status' => $wc_product->get_stock_status(),
           );
         }
         return $product_data;
