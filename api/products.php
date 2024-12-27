@@ -8,9 +8,11 @@ add_action('rest_api_init', function () {
       $post = get_post($product_id);
       $author_id = $post->post_author;
       $author_name = get_the_author_meta('display_name', $author_id);
+      $metronet_image_id = get_user_option('metronet_image_id', $author_id);
       return [
         'id' => $author_id,
         'name' => $author_name,
+        'image_url' => wp_get_attachment_url($metronet_image_id),
       ];
     },
     'schema' => [

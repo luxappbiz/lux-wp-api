@@ -180,23 +180,18 @@ function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
   ]);
 }
 
-function lux_mobile_app_update_user_func(WP_REST_Request $request)
-{
-  $user_id  = get_current_user_id();
+function lux_mobile_app_update_user_func(WP_REST_Request $request) {
+  $user_id = get_current_user_id();
   $new_display_name = sanitize_text_field($request->get_param('display_name'));
   $media_id = null;
-
   if (! $user_id) {
     return new WP_Error('mpp_no_user', __('User not found.', ''), array('status' => 403));
   }
-
   if (! current_user_can('upload_files', $user_id)) {
     return new WP_Error('mpp_insufficient_privs', __('You must be able to upload files.', ''), array('status' => 403));
   }
-
   $fileParams = $request->get_file_params();
-  $post_id = get_media_post_id($user_id);
-
+  $post_id = lux_get_media_post_id($user_id);
   // Save user meta.
   update_user_option($user_id, 'metronet_post_id', $post_id);
   if ($image = $fileParams['profile_image']) {
@@ -206,17 +201,14 @@ function lux_mobile_app_update_user_func(WP_REST_Request $request)
     }
     $media_id = lux_create_attachment($upload['file'], $upload['url'], $post_id);
   }
-
   update_user_option($user_id, 'metronet_image_id', $media_id);
   set_post_thumbnail($post_id, $media_id);
   $user_data = [
     'ID' => $user_id,
     'display_name' => $new_display_name,
   ];
-
   // Update the user
   $result = wp_update_user($user_data);
-
   if (is_wp_error($result)) {
     wp_send_json([
       'success'=>false,
@@ -228,43 +220,39 @@ function lux_mobile_app_update_user_func(WP_REST_Request $request)
   ]);
 }
 
- function get_media_post_id( $user_id = 0 ) {
-
+ function lux_get_media_post_id( $user_id = 0 ) {
   $user = get_user_by( 'id', $user_id );
-
   // Get/Create Profile Picture Post.
   $post_args = array(
-      'post_type'   => 'mt_pp',
-      'author'      => $user_id,
-      'post_status' => 'publish',
+    'post_type'   => 'mt_pp',
+    'author'      => $user_id,
+    'post_status' => 'publish',
   );
-  $posts     = get_posts( $post_args );
+  $posts = get_posts( $post_args );
   if ( ! $posts ) {
-      $post_id = wp_insert_post(
-          array(
-              'post_author' => $user_id,
-              'post_type'   => 'mt_pp',
-              'post_status' => 'publish',
-              'post_title'  => $user->data->display_name,
-          )
-      );
+    $post_id = wp_insert_post(
+      array(
+        'post_author' => $user_id,
+        'post_type'   => 'mt_pp',
+        'post_status' => 'publish',
+        'post_title'  => $user->data->display_name,
+      )
+    );
   } else {
-      $post    = end( $posts );
-      $post_id = $post->ID;
+    $post    = end( $posts );
+    $post_id = $post->ID;
   }
   return $post_id;
 }
 
 function lux_api_handle_forgot_password(WP_REST_Request $request) {
   $email = sanitize_email($request->get_param('email'));
-
   if (!is_email($email)) {
     return wp_send_json([
       'message' => 'The provided email address is not valid.',
       'success' => false,
     ], 404);
   }
-
   $user = get_user_by('email', $email);
   if (!$user) {
     return wp_send_json([
@@ -272,41 +260,33 @@ function lux_api_handle_forgot_password(WP_REST_Request $request) {
       'success' => false,
     ], 404);
   }
-
   $reset_key = get_password_reset_key($user);
-
   if (is_wp_error($reset_key)) {
     return wp_send_json([
       'message' => 'Failed to generate password reset link.',
       'success' => false,
     ], 500);
   }
-
   $reset_url = network_site_url("wp-login.php?action=rp&key=$reset_key&login=" . rawurlencode($user->user_login));
-
   $message = sprintf(
     "Hello,\n\nYou requested a password reset for your account on %s.\n\nTo reset your password, click the link below:\n\n%s\n\nIf you did not request this, please ignore this email.",
     get_bloginfo('name'),
     $reset_url
   );
-
   $mail_sent = wp_mail($email, 'Password Reset Request', $message);
-
   if (!$mail_sent) {
     return wp_send_json([
       'message' => 'Failed to send the password reset email.',
       'success' => false,
     ], 500);
   }
-
   return wp_send_json([
     'message' => 'User password reset email sent successfully.',
     'success' => true,
   ]);
 }
 
-function lux_api_validate_password(WP_REST_Request $request)
-{
+function lux_api_validate_password(WP_REST_Request $request) {
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST');
   header("Access-Control-Allow-Headers: X-Requested-With");
@@ -315,7 +295,6 @@ function lux_api_validate_password(WP_REST_Request $request)
   $user_id = $body['id'];
   $password = $body['password'];
   $user = get_user_by('ID', $user_id);
-
   if (!$user || !wp_check_password($password, $user->data->user_pass, $user_id)) {
     wp_send_json([
       'success' => false,
