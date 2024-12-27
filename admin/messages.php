@@ -53,6 +53,7 @@ add_action('admin_init', function () {
       message TEXT NOT NULL,
       attachment_id INT(11) UNSIGNED NOT NULL,
       reactions JSON DEFAULT NULL,
+      read_at DATETIME DEFAULT NULL,
       deleted_at DATETIME DEFAULT NULL,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

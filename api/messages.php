@@ -70,6 +70,28 @@ add_action('rest_api_init', function () {
       )
     )
   ));
+  /**
+   * API - Conversation Message DELETE - Deleting a message (soft delete)
+   */
+  register_rest_route('lux/v1', '/conversations/(?P<conversation_id>\d+)/messages/(?P<message_id>\d+)', array(
+    'methods' => 'DELETE',
+    'callback' => 'lux_api_delete_conversation_message',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
+    'args' => array(
+      'conversation_id' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric($param);
+        }
+      ),
+      'message_id' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric($param);
+        }
+      )
+    )
+  ));
 });
 
 function lux_api_get_conversations( WP_REST_Request $request ) {
@@ -295,5 +317,37 @@ function lux_api_update_conversation_message( WP_REST_Request $request ) {
   return new WP_REST_Response(array(
     'message' => 'To do: under construction',
     'message_id' => $message_id
+  ), 200);
+}
+
+function lux_api_delete_conversation_message( WP_REST_Request $request ) {
+  $conversation_id = $request['conversation_id'];
+  $message_id = $request['message_id'];
+  global $wpdb;
+  $table_messages = $wpdb->prefix . 'lux_messages';
+  // Soft Delete the message
+  $deleted = $wpdb->update(
+    $table_messages,
+    array(
+      'deleted_at' => current_time('mysql'), // Column and value to update
+    ),
+    array(
+      'id' => $message_id // Where clause
+    ),
+    array(
+      '%s' // Format for updated_at (string)
+    ),
+    array(
+      '%d' // Format for id (integer)
+    )
+  );
+  // Hard Delete the message
+  // $deleted = $wpdb->delete($table_messages, array(
+  //   'message_id' => $message_id, 
+  //   'conversation_id' => $conversation_id
+  // ), array('%d', '%d'));
+  return new WP_REST_Response(array(
+    'message_id' => $message_id
+    'deleted' => $deleted,
   ), 200);
 }
