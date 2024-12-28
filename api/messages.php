@@ -146,14 +146,14 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
           $conversation_name = get_user_meta($other_conversation_user_id, 'first_name', true) . ' ' . get_user_meta($other_conversation_user_id, 'last_name', true);
         }
         // Unread Messages Count
-        $table = $wpdb->prefix . 'lux_messages_read';
-        $sql = "SELECT COUNT(*) FROM $table WHERE conversation_id = $conversation_id AND user_id != $user_id AND read_at IS null";
-        $unread_messages_count = $wpdb->get_var($sql);
+        $table_messages_read = $wpdb->prefix . 'lux_messages_read';
+        $sql = "SELECT COUNT(*) FROM $table_messages_read WHERE conversation_id = $conversation_id AND user_id = $user_id AND read_at IS null";
+        $messages_unread_count = $wpdb->get_var($sql);
         $conversations[] = array(
           'id' => (int)$conversation_id,
           'name' => $conversation_name,
           'image_url' => $image_url,
-          'unread_messages_count' => (int)$unread_messages_count,
+          'messages_unread_count' => (int)$messages_unread_count,
           'updated_at' => $conversation_data->updated_at,
           'created_at' => $conversation_data->created_at,
         );
@@ -331,7 +331,7 @@ function lux_api_get_conversation_messages( WP_REST_Request $request ) {
   }
   // Mark all Unread messages as read
   $user_id = get_current_user_id();
-  $messages_marked_read = false;
+  $messages_marked_read = 0;
   if ($user_id) {
     $table = $wpdb->prefix . 'lux_messages_read';
     $messages_marked_read = $wpdb->update(
