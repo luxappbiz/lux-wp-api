@@ -1,6 +1,9 @@
 <?php
 
 add_action('rest_api_init', function () {
+  /**
+   * API - GET conversations
+   */
   register_rest_route('lux/v1', '/conversations', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_conversations',
@@ -10,15 +13,15 @@ add_action('rest_api_init', function () {
     },
   ));
   /**
-   * Register the REST API route for creating a new conversation.
+   * API - Create new conversation
    */
   register_rest_route( 'lux/v1', '/conversations', array(
     'methods' => 'POST',
     'callback' => 'lux_api_create_conversation',
-    'permission_callback' => '__return_true'
-    // 'permission_callback' => function () {
-    //   return current_user_can( 'edit_posts' ); // Adjust permissions as needed
-    // }
+    // 'permission_callback' => '__return_true'
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ) );
   /**
    * API - New Conversation Message
@@ -26,10 +29,10 @@ add_action('rest_api_init', function () {
   register_rest_route( 'lux/v1', '/conversations/(?P<conversation_id>\d+)/messages', array(
     'methods' => 'POST',
     'callback' => 'lux_api_create_conversation_message',
-    // 'permission_callback' => function () {
-    //   return current_user_can( 'edit_posts' ); // Adjust permissions as needed
-    // },
-    'permission_callback' => '__return_true',
+    // 'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
     'args' => array(
       'conversation_id' => array(
         'validate_callback' => function($param, $request, $key) {
@@ -41,7 +44,10 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/conversations/(?P<conversation_id>\d+)/messages', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_conversation_messages',
-    'permission_callback' => '__return_true',
+    // 'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
     'args' => array(
       'conversation_id' => array(
         'validate_callback' => function($param, $request, $key) {
@@ -99,7 +105,8 @@ add_action('rest_api_init', function () {
 
 function lux_api_get_conversations( WP_REST_Request $request ) {
   // Get Conversations by User ID
-  $user_id = $request->get_param('user_id');
+  // $user_id = $request->get_param('user_id');
+  $user_id = get_current_user_id();
   if (!$user_id) {
     return new WP_REST_Response(array(
       'error' => 'User ID is required to get conversations.',
@@ -138,10 +145,15 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
         if ($conversation_name == '') {
           $conversation_name = get_user_meta($other_conversation_user_id, 'first_name', true) . ' ' . get_user_meta($other_conversation_user_id, 'last_name', true);
         }
+        // Unread Messages Count
+        $table_messages_read = $wpdb->prefix . 'lux_messages_read';
+        $sql = "SELECT COUNT(*) FROM $table_messages_read WHERE conversation_id = $conversation_id AND user_id = $user_id AND read_at IS null";
+        $messages_unread_count = $wpdb->get_var($sql);
         $conversations[] = array(
-          'id' => $conversation_id,
+          'id' => (int)$conversation_id,
           'name' => $conversation_name,
           'image_url' => $image_url,
+          'messages_unread_count' => (int)$messages_unread_count,
           'updated_at' => $conversation_data->updated_at,
           'created_at' => $conversation_data->created_at,
         );
@@ -259,6 +271,22 @@ function lux_api_create_conversation_message( WP_REST_Request $request ) {
         '%d' // Format for id (integer)
       )
     );
+    // Create Message Read (Unread) records for every other user in the conversation other than current $user_id
+    $table = $wpdb->prefix . 'lux_conversation_users';
+    $sql = "SELECT user_id FROM $table WHERE conversation_id = $conversation_id AND user_id != $user_id";
+    $conversation_users_data = $wpdb->get_results($sql);
+    if ($conversation_users_data) {
+      $table_messages_read = $wpdb->prefix . 'lux_messages_read';
+      foreach ($conversation_users_data as $conversation_user_data) {
+        $conversation_user_id = $conversation_user_data->user_id;
+        $data = array(
+          'conversation_id' => $conversation_id,
+          'message_id' => $message_id,
+          'user_id' => $conversation_user_id, // other user id
+        );
+        $success = $wpdb->insert($table_messages_read, $data);
+      }
+    }
     return new WP_REST_Response(array(
       'message_id' => $message_id,
       'message' => 'Conversation message created success.'
@@ -301,8 +329,28 @@ function lux_api_get_conversation_messages( WP_REST_Request $request ) {
       );
     }
   }
+  // Mark all Unread messages as read
+  $user_id = get_current_user_id();
+  $messages_marked_read = 0;
+  if ($user_id) {
+    $table = $wpdb->prefix . 'lux_messages_read';
+    $messages_marked_read = $wpdb->update(
+      $table,
+      array(
+        'read_at' => current_time('mysql'),
+      ),
+      array(
+        'conversation_id' => intval($conversation_id),
+        'user_id' => intval($user_id),
+      ),
+      array('%s'),
+      array('%d', '%d')
+    );
+  }
   return new WP_REST_Response(array(
-    'messages' => $messages, 
+    'user_id' => $user_id, 
+    'messages' => $messages,
+    'messages_marked_read' => $messages_marked_read,
   ), 201); 
 }
 
