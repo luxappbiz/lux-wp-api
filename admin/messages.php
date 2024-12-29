@@ -198,6 +198,7 @@ function lux_admin_conversations_page_content() {
                   <th>Message</th>
                   <th>Attachment ID</th>
                   <th>Reactions</th>
+                  <th>Deleted At</th>
                   <th>Updated At</th>
                   <th>Created At</th>
                 </tr>
@@ -217,6 +218,7 @@ function lux_admin_conversations_page_content() {
                     <td><?= $message->message ?></td>
                     <td><?= $message->attachment_id ?></td>
                     <td><?= $message->reactions ?></td>
+                    <td><?= $message->deleted_at ?></td>
                     <td><?= $message->updated_at ?></td>
                     <td><?= $message->created_at ?></td>
                   </tr>
