@@ -187,9 +187,9 @@ function lux_mobile_app_update_user_func(WP_REST_Request $request) {
   if (! $user_id) {
     return new WP_Error('mpp_no_user', __('User not found.', ''), array('status' => 403));
   }
-  if (! current_user_can('upload_files', $user_id)) {
-    return new WP_Error('mpp_insufficient_privs', __('You must be able to upload files.', ''), array('status' => 403));
-  }
+  // if (! current_user_can('upload_files', $user_id)) {
+  //   return new WP_Error('mpp_insufficient_privs', __('You must be able to upload files.', ''), array('status' => 403));
+  // }
   $fileParams = $request->get_file_params();
   $post_id = lux_get_media_post_id($user_id);
   // Save user meta.
