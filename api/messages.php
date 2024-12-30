@@ -324,6 +324,7 @@ function lux_api_get_conversation_messages( WP_REST_Request $request ) {
         'message' => $message_data->message,
         'attachment_id' => $message_data->attachment_id,
         'reactions' => $message_data->reactions,
+        'deleted_at' => $message_data->deleted_at,
         'updated_at' => $message_data->updated_at,
         'created_at' => $message_data->created_at,
       );
