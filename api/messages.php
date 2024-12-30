@@ -169,7 +169,7 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
   });
   return new WP_REST_Response(array(
     'sort' => $sort,
-    'conversations' => $conversations, 
+    'conversations' => $conversations,
   ), 201);
 }
 
@@ -196,7 +196,7 @@ function lux_api_create_conversation( WP_REST_Request $request ) {
   }
   if ($existing_conversation_id) {
     return new WP_REST_Response(array(
-      'sql' => $sql,
+      // 'sql' => $sql,
       'conversation_id' => $existing_conversation_id,
       'message' => 'Conversation already exists.'
     ), 201);
@@ -383,7 +383,7 @@ function lux_api_update_conversation_message( WP_REST_Request $request ) {
   );
   // Return response message
   return new WP_REST_Response(array(
-    'last_query' => $wpdb->last_query,
+    // 'last_query' => $wpdb->last_query,
     'result' => $result,
     'message' => 'Updated message',
     'message_id' => $message_id
