@@ -104,13 +104,28 @@ add_action('rest_api_init', function() {
       'get_callback' => function ($object, $field_name, $request) {
         $user_id = (int)$object['id'];
         // $user = get_user_by('ID', $user_id);
-        return get_user_meta($user_id, 'user_requested_data_deletion', true);
+        return get_user_meta($user_id, 'data_deletion_requested_at', true);
       },
-      'update_callback' => function ( $value, $object ) use ( $field ) {
-        // Update the field/meta value.
-        update_post_meta( $object->ID, $field, $value );
-      },,
-      'schema' => null,
+      'update_callback' => function ($value, $user, $field_name) {
+        if (get_current_user_id() == $user->ID) {
+          if (empty($value)) {
+            delete_user_meta($user->ID, $field_name);
+            return true;
+          }
+          return update_user_meta($user->ID, $field_name, $value);
+        }
+        return new WP_Error(
+          'rest_forbidden',
+          'You are not allowed to update this field.',
+          ['status' => 403]
+        );
+      },
+      'schema' => [
+        'description' => __('Date and time when the data deletion was requested.'),
+        'type' => 'string',
+        'format' => 'date-time',
+        'context' => ['view', 'edit'],
+      ],
     )
   );
 });
