@@ -33,7 +33,6 @@ function lux_create_attachment($file, $url, $post_id = null)
 /*
  * Admin
  */
-
 require_once( $template_directory . '/../lux-wp-api/admin/admin.php' );
 
 require_once( $template_directory . '/../lux-wp-api/admin/messages.php' );

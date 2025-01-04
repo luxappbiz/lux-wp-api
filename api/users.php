@@ -92,3 +92,25 @@ add_filter( 'rest_prepare_user', function ( $response, $post, $request ) {
   return $response;
 }, 10, 3 );
 */
+
+/*
+ * User - Data Deletion Requested At
+ */
+add_action('rest_api_init', function() {
+  register_rest_field(
+    'user',
+    'data_deletion_requested_at',
+    array(
+      'get_callback' => function ($object, $field_name, $request) {
+        $user_id = (int)$object['id'];
+        // $user = get_user_by('ID', $user_id);
+        return get_user_meta($user_id, 'user_requested_data_deletion', true);
+      },
+      'update_callback' => function ( $value, $object ) use ( $field ) {
+        // Update the field/meta value.
+        update_post_meta( $object->ID, $field, $value );
+      },,
+      'schema' => null,
+    )
+  );
+});
