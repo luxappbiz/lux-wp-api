@@ -18,3 +18,10 @@ add_filter( 'login_headerurl', function () {
 add_filter( 'login_headertext', function () {
   return get_bloginfo('name'); // Replace with your desired site name
 } );
+
+/**
+ * WooCommerce - Products
+ */
+add_action( 'init', function () {
+  add_post_type_support( 'product', 'author' );
+} );

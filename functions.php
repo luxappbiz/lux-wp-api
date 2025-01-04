@@ -54,3 +54,12 @@ require_once( $template_directory . '/../lux-wp-api/api/favorites.php' );
 require_once( $template_directory . '/../lux-wp-api/api/messages.php' );
 
 require_once( $template_directory . '/../lux-wp-api/api/sellers.php' );
+
+/**
+ * Theme nav menus
+ */
+register_nav_menus( array(
+  'header' => __( 'Header', 'lux' ),
+  'footer' => __( 'Footer', 'lux' ),
+  'primary' => __( 'Primary', 'lux' ),
+) );
