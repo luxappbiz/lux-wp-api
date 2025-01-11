@@ -33,26 +33,26 @@ function lux_create_attachment($file, $url, $post_id = null)
 /*
  * Admin
  */
-require_once( $template_directory . '/../lux-wp-api/admin/admin.php' );
+require_once( $template_directory . '/admin/admin.php' );
 
-require_once( $template_directory . '/../lux-wp-api/admin/messages.php' );
+require_once( $template_directory . '/admin/messages.php' );
 
 /*
  * API
  */
-require_once( $template_directory . '/../lux-wp-api/api/products.php' );
+require_once( $template_directory . '/api/products.php' );
 
-// require_once( $template_directory . '/../lux-wp-api/api/vendors.php' );
+// require_once( $template_directory . '/api/vendors.php' );
 
-require_once( $template_directory . '/../lux-wp-api/api/users.php' );
+require_once( $template_directory . '/api/users.php' );
 
-require_once( $template_directory . '/../lux-wp-api/api/mobile-api.php' );
+require_once( $template_directory . '/api/mobile-api.php' );
 
-require_once( $template_directory . '/../lux-wp-api/api/favorites.php' );
+require_once( $template_directory . '/api/favorites.php' );
 
-require_once( $template_directory . '/../lux-wp-api/api/messages.php' );
+require_once( $template_directory . '/api/messages.php' );
 
-require_once( $template_directory . '/../lux-wp-api/api/sellers.php' );
+require_once( $template_directory . '/api/sellers.php' );
 
 /**
  * Theme nav menus
@@ -62,3 +62,8 @@ register_nav_menus( array(
   'footer' => __( 'Footer', 'lux' ),
   'primary' => __( 'Primary', 'lux' ),
 ) );
+
+/*
+ * Public
+ */
+require_once( $template_directory . '/public/woocommerce.php' );

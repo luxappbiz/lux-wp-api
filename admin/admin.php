@@ -6,7 +6,7 @@
  * Login - Assets.
  */
 add_action('login_enqueue_scripts', function () {
-  wp_enqueue_style( 'admin-login', get_template_directory_uri() . '/../lux-wp-api/assets/styles/admin-login.css', false, null );
+  wp_enqueue_style( 'admin-login', get_template_directory_uri() . '/assets/styles/admin-login.css', false, null );
 });
 
 // Replace WordPress.org login link
