@@ -49,7 +49,6 @@ require_once( $template_directory . '/admin/messages.php' );
 
 
 function custom_rest_api_cors_headers() {
-  // Allow all origins or specify your domain
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
   header('Access-Control-Allow-Credentials: true');
