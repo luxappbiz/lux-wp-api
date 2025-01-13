@@ -42,6 +42,8 @@ add_action( 'rest_exposed_cors_headers', function ($headers) {
   $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'; // Allowed HTTP methods
   $headers['Access-Control-Allow-Credentials'] = 'true'; // Whether credentials are allowed
   $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, X-WP-Nonce'; // Allowed headers
+  $headers['AB-TEST'] = 'TEST'; // Allowed headers
+
   return $headers;
 }, 20);
 
