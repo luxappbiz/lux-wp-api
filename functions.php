@@ -46,14 +46,7 @@ require_once( $template_directory . '/admin/messages.php' );
 //   $headers['AB-TEST'] = 'TEST';
 //   return $headers;
 // }, 200);
-// add_filter('rest_exposed_cors_headers', function ($headers) {
-//   $headers['Access-Control-Allow-Origin'] = '*';
-//   $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
-//   $headers['Access-Control-Allow-Credentials'] = 'true';
-//   $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, X-WP-Nonce';
-//   $headers['AB-TEST'] = 'TEST';
-//   return $headers;
-// }, 200);
+
 
 function custom_rest_api_cors_headers() {
   // Allow all origins or specify your domain
@@ -70,6 +63,14 @@ function custom_rest_api_cors_headers() {
 }
 add_action('rest_api_init', function () {
   add_action('rest_pre_serve_request', 'custom_rest_api_cors_headers');
+  add_filter('rest_exposed_cors_headers', function ($headers) {
+    $headers['Access-Control-Allow-Origin'] = '*';
+    $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+    $headers['Access-Control-Allow-Credentials'] = 'true';
+    $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, X-WP-Nonce';
+    $headers['AB-TEST'] = 'TEST';
+    return $headers;
+  }, 200);
 }, 1);
 
 
