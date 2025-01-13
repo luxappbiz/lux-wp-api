@@ -70,7 +70,7 @@ function custom_rest_api_cors_headers() {
 }
 add_action('rest_api_init', function () {
   add_action('rest_pre_serve_request', 'custom_rest_api_cors_headers');
-});
+}, 1);
 
 
 /*
