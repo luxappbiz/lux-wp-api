@@ -37,15 +37,41 @@ require_once( $template_directory . '/admin/admin.php' );
 
 require_once( $template_directory . '/admin/messages.php' );
 
-add_filter( 'rest_exposed_cors_headers', function ($headers) {
-  $headers['Access-Control-Allow-Origin'] = '*'; // Allow all origins or specify your domain (e.g., 'https://example.com')
-  $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'; // Allowed HTTP methods
-  $headers['Access-Control-Allow-Credentials'] = 'true'; // Whether credentials are allowed
-  $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, X-WP-Nonce'; // Allowed headers
-  $headers['AB-TEST'] = 'TEST'; // Allowed headers
 
-  return $headers;
-}, 20);
+// add_filter('rest_allowed_cors_headers', function ($headers) {
+//   $headers['Access-Control-Allow-Origin'] = '*';
+//   $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+//   $headers['Access-Control-Allow-Credentials'] = 'true';
+//   $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, X-WP-Nonce';
+//   $headers['AB-TEST'] = 'TEST';
+//   return $headers;
+// }, 200);
+// add_filter('rest_exposed_cors_headers', function ($headers) {
+//   $headers['Access-Control-Allow-Origin'] = '*';
+//   $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS';
+//   $headers['Access-Control-Allow-Credentials'] = 'true';
+//   $headers['Access-Control-Allow-Headers'] = 'Authorization, Content-Type, X-WP-Nonce';
+//   $headers['AB-TEST'] = 'TEST';
+//   return $headers;
+// }, 200);
+
+function custom_rest_api_cors_headers() {
+  // Allow all origins or specify your domain
+  header('Access-Control-Allow-Origin: *');
+  header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+  header('Access-Control-Allow-Credentials: true');
+  header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce');
+
+  // Handle preflight OPTIONS request
+  if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+      header('HTTP/1.1 200 OK');
+      exit;
+  }
+}
+add_action('rest_api_init', function () {
+  add_action('rest_pre_serve_request', 'custom_rest_api_cors_headers');
+});
+
 
 /*
  * API
