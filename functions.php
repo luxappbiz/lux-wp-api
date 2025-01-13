@@ -37,7 +37,7 @@ require_once( $template_directory . '/admin/admin.php' );
 
 require_once( $template_directory . '/admin/messages.php' );
 
-add_action( 'rest_exposed_cors_headers', function ($headers) {
+add_filter( 'rest_exposed_cors_headers', function ($headers) {
   $headers['Access-Control-Allow-Origin'] = '*'; // Allow all origins or specify your domain (e.g., 'https://example.com')
   $headers['Access-Control-Allow-Methods'] = 'GET, POST, PUT, DELETE, OPTIONS'; // Allowed HTTP methods
   $headers['Access-Control-Allow-Credentials'] = 'true'; // Whether credentials are allowed

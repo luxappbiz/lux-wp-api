@@ -220,10 +220,6 @@ add_action( 'rest_api_init', function () {
 
 function lux_create_product_with_image(WP_REST_Request $request)
 {
-  ini_set('display_errors', '1');
-  ini_set('display_startup_errors', '1');
-  error_reporting(E_ALL);
-
   if (!class_exists('WC_Product')) {
     return new WP_Error('woocommerce_not_active', 'WooCommerce is not active', array('status' => 500));
   }
