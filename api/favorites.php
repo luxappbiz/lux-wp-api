@@ -4,28 +4,30 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_favorites',
-    'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'POST',
     'callback' => 'lux_api_add_favorite',
-    'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
 
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'DELETE',
     'callback' => 'lux_api_remove_favorite',
-    'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
 });
 
 function lux_api_get_favorites( WP_REST_Request $request ) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-  header('Access-Control-Allow-Credentials: true');
-  header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Nonce');
-
+  custom_rest_api_cors_headers();
   $user_id = get_current_user_id();
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
@@ -59,6 +61,7 @@ function lux_api_get_favorites( WP_REST_Request $request ) {
 }
 
 function lux_api_add_favorite( WP_REST_Request $request ) {
+  custom_rest_api_cors_headers();
   $data = $request->get_body();
   $data = json_decode($data, true);
   if (!isset($data['product_id']) || $data['product_id'] == null) {
@@ -107,6 +110,7 @@ function lux_api_add_favorite( WP_REST_Request $request ) {
 }
 
 function lux_api_remove_favorite( WP_REST_Request $request ) {
+  custom_rest_api_cors_headers();
   $data = $request->get_body();
   $data = json_decode($data, true);
 

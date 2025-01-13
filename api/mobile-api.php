@@ -16,15 +16,19 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/user', array(
     'methods' => 'GET',
     'callback' => 'lux_mobile_app_get_user_func',
-    'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
 
   register_rest_route('lux/v1', '/user', array(
     'methods' => 'POST',
     'callback' => 'lux_mobile_app_update_user_func',
-    'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
   ));
-
+  
   register_rest_route('lux/v1', '/forgot-password', [
     'methods' => 'POST',
     'callback' => 'lux_api_handle_forgot_password',
@@ -39,6 +43,7 @@ add_action( 'rest_api_init', function () {
 });
 
 function lux_api_register(WP_REST_Request $request) {
+  custom_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
   $email = $body['email'];
@@ -99,6 +104,7 @@ function lux_create_unique_username_by_email($email) {
 
 function lux_api_login(WP_REST_Request $request)
 {
+  custom_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
   $login = $body['login'];
@@ -164,6 +170,7 @@ function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
 }
 
 function lux_mobile_app_update_user_func(WP_REST_Request $request) {
+  custom_rest_api_cors_headers();
   $user_id = get_current_user_id();
   $new_display_name = sanitize_text_field($request->get_param('display_name'));
   $media_id = null;
@@ -229,6 +236,7 @@ function lux_mobile_app_update_user_func(WP_REST_Request $request) {
 }
 
 function lux_api_handle_forgot_password(WP_REST_Request $request) {
+  custom_rest_api_cors_headers();
   $email = sanitize_email($request->get_param('email'));
   if (!is_email($email)) {
     return wp_send_json([

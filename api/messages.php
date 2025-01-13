@@ -7,7 +7,6 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/conversations', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_conversations',
-    // 'permission_callback' => '__return_true'
     'permission_callback' => function($request) {
       return is_user_logged_in();
     },
@@ -18,7 +17,6 @@ add_action('rest_api_init', function () {
   register_rest_route( 'lux/v1', '/conversations', array(
     'methods' => 'POST',
     'callback' => 'lux_api_create_conversation',
-    // 'permission_callback' => '__return_true'
     'permission_callback' => function($request) {
       return is_user_logged_in();
     },
@@ -29,7 +27,6 @@ add_action('rest_api_init', function () {
   register_rest_route( 'lux/v1', '/conversations/(?P<conversation_id>\d+)/messages', array(
     'methods' => 'POST',
     'callback' => 'lux_api_create_conversation_message',
-    // 'permission_callback' => '__return_true',
     'permission_callback' => function($request) {
       return is_user_logged_in();
     },
@@ -44,7 +41,6 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/conversations/(?P<conversation_id>\d+)/messages', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_conversation_messages',
-    // 'permission_callback' => '__return_true',
     'permission_callback' => function($request) {
       return is_user_logged_in();
     },
@@ -62,7 +58,6 @@ add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/conversations/(?P<conversation_id>\d+)/messages/(?P<message_id>\d+)', array(
     'methods' => 'PUT',
     'callback' => 'lux_api_update_conversation_message',
-    // 'permission_callback' => '__return_true',
     'permission_callback' => function($request) {
       return is_user_logged_in();
     },
