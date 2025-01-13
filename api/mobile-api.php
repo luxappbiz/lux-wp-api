@@ -1,12 +1,6 @@
 <?php
 
 add_action( 'rest_api_init', function () {
-  add_action( 'rest_pre_serve_request', function () {
-    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Wpml-Language', true );
-    header("Access-Control-Allow-Origin: *");
-    // header('Access-Control-Allow-Methods: GET, POST');
-    // header("Access-Control-Allow-Headers: X-Requested-With");
-  });
   register_rest_route('lux/v1', '/register', array(
     'methods' => 'POST',
     'callback' => 'lux_api_register',
@@ -45,9 +39,6 @@ add_action( 'rest_api_init', function () {
 });
 
 function lux_api_register(WP_REST_Request $request) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
   $body = $request->get_body();
   $body = json_decode($body, true);
   $email = $body['email'];
@@ -108,9 +99,6 @@ function lux_create_unique_username_by_email($email) {
 
 function lux_api_login(WP_REST_Request $request)
 {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
   $body = $request->get_body();
   $body = json_decode($body, true);
   $login = $body['login'];
@@ -152,10 +140,6 @@ function lux_generate_random_string($length = 10) {
 }
 
 function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
-
   $authorization = $request->get_header_as_array('authorization');
   if (!$authorization) {
     wp_send_json([
@@ -286,9 +270,6 @@ function lux_api_handle_forgot_password(WP_REST_Request $request) {
 }
 
 function lux_api_validate_password(WP_REST_Request $request) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET, POST');
-  header("Access-Control-Allow-Headers: X-Requested-With");
   $body = $request->get_body();
   $body = json_decode($body, true);
   $user_id = $body['id'];

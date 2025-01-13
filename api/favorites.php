@@ -1,11 +1,6 @@
 <?php
 
 add_action( 'rest_api_init', function () {
-  add_action( 'rest_pre_serve_request', function () {
-    header('Access-Control-Allow-Methods: GET, POST');
-    header('Access-Control-Allow-Headers: Authorization, Content-Type, X-WP-Wpml-Language');
-    header("Access-Control-Allow-Origin: *");
-  });
   register_rest_route('lux/v1', '/favourites', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_favorites',

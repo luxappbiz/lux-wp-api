@@ -12,9 +12,6 @@ add_action('rest_api_init', function () {
 });
 
 function lux_api_get_sellers( WP_REST_Request $request ) {
-  header('Access-Control-Allow-Origin: *');
-  header('Access-Control-Allow-Methods: GET');
-  header("Access-Control-Allow-Headers: X-Requested-With");
   // $page_id = 66;
   // $include = array();
   // $exclude_members = get_field('exclude_members', $page_id) ?? array();

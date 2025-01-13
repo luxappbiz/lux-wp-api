@@ -37,6 +37,12 @@ require_once( $template_directory . '/admin/admin.php' );
 
 require_once( $template_directory . '/admin/messages.php' );
 
+add_action( 'rest_exposed_cors_headers', function ($headers) {
+  $headers["Access-Control-Allow-Methods"] = 'GET, POST, PUT, DELETE';
+  $headers["Access-Control-Allow-Origin"] = '*';
+  $headers["Access-Control-Allow-Headers"] = 'Authorization, Content-Type, X-WP-Wpml-Language, X-Requested-With';
+  return $headers;
+});
 /*
  * API
  */
