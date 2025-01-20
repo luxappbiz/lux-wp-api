@@ -45,7 +45,7 @@ add_action('rest_api_init', function () {
         $args = array(
           'post_type'   => 'product',
           'author'      => $user_id,
-          'post_status' => get_post_statuses(),
+          'post_status' => ['publish','pending'],
           'numberposts' => -1, // Retrieve all products authored by this user.
         );
         $products = get_posts($args);
