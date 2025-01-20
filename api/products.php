@@ -241,7 +241,7 @@ function lux_create_product_with_image(WP_REST_Request $request)
   $product->set_name($title);
   $product->set_regular_price($price);
   $product->set_category_ids([$category_id]);
-
+  $product->set_status('pending');
   // Handle main image upload
   $upload = wp_handle_upload($image, ['test_form' => false]);
   if (isset($upload['error'])) {
