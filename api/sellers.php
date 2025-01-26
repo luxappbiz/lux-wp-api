@@ -163,7 +163,7 @@ function lux_api_update_seller_blocked( WP_REST_Request $request ) {
   $blocked_str = get_user_meta($seller_id, 'blocked', true);
   if ($blocked_str) {
     $blocked_ar = explode(',', $blocked_str);
-    $blocked_ar[] = $user_id_to_block
+    $blocked_ar[] = $user_id_to_block;
     update_user_meta($seller_id, 'blocked', implode(',', $blocked_ar));
   } else {
     update_user_meta($seller_id, 'blocked', $user_id_to_block);
