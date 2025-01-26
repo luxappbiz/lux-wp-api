@@ -84,7 +84,8 @@ $last_name = get_user_meta($current_user_id, 'last_name', true);
 .recent-subscriptions_heading {
   margin-bottom: 0;
 }
-.recent-orders .list-group a {
+.recent-orders .list-group a,
+.recent-subscriptions .list-group a {
   color: black;
 }
 .list-group-item_row {

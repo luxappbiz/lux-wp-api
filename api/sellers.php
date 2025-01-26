@@ -9,6 +9,50 @@ add_action('rest_api_init', function () {
       return is_user_logged_in();
     },
   ));
+  // register_rest_route('lux/v1', '/sellers/(?P<seller_id>\d+)', array(
+  //   'methods' => 'GET',
+  //   'callback' => 'lux_api_get_seller',
+  //   // 'permission_callback' => '__return_true',
+  //   'permission_callback' => function($request) {
+  //     return is_user_logged_in();
+  //   },
+  // ));
+  /*
+   * GET Seller Blocked
+   */
+  register_rest_route('lux/v1', '/sellers/(?P<seller_id>\d+)/blocked', array(
+    'methods' => 'GET',
+    'callback' => 'lux_api_get_seller_blocked',
+    // 'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
+    'args' => array(
+      'seller_id' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric($param);
+        }
+      )
+    ),
+  ));
+  /*
+   * PUT/UPDATE Seller Blocked
+   */
+  register_rest_route('lux/v1', '/sellers/(?P<seller_id>\d+)/blocked', array(
+    'methods' => 'PUT',
+    'callback' => 'lux_api_update_seller_blocked',
+    // 'permission_callback' => '__return_true',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
+    'args' => array(
+      'seller_id' => array(
+        'validate_callback' => function($param, $request, $key) {
+          return is_numeric($param);
+        }
+      )
+    ),
+  ));
 });
 
 function lux_api_get_sellers( WP_REST_Request $request ) {
@@ -90,4 +134,41 @@ function lux_api_get_sellers( WP_REST_Request $request ) {
     'sellers' => $members,
     'count' => $users_count,
   ]);
+}
+
+// Get Seller's Blocked Users
+function lux_api_get_seller_blocked( WP_REST_Request $request ) {
+  $seller_id = (int)$request['seller_id'];
+  if (!$seller_id) {
+    return new WP_REST_Response(array(
+      'success' => false,
+    ), 500);
+  }
+  $blocked = get_user_meta($seller_id, 'blocked', true); // comma separated string of user_ids
+  return new WP_REST_Response(array(
+    'success' => true,
+    'blocked' => $blocked,
+  ), 200);  
+}
+
+// Update Seller's Blocked Users
+function lux_api_update_seller_blocked( WP_REST_Request $request ) {
+  $seller_id = (int)$request['seller_id'];
+  if (!$seller_id) {
+    return new WP_REST_Response(array(
+      'success' => false,
+    ), 500);
+  }
+  $user_id_to_block = $request->get_param('user_id_to_block');
+  $blocked_str = get_user_meta($seller_id, 'blocked', true);
+  if ($blocked_str) {
+    $blocked_ar = explode(',', $blocked_str);
+    $blocked_ar[] = $user_id_to_block
+    update_user_meta($seller_id, 'blocked', implode(',', $blocked_ar));
+  } else {
+    update_user_meta($seller_id, 'blocked', $user_id_to_block);
+  }
+  return new WP_REST_Response(array(
+    'success' => true,
+  ), 200);  
 }
