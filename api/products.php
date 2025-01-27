@@ -174,6 +174,12 @@ add_action('rest_api_init', function () {
     'callback' => 'lux_update_product_with_image',
     'permission_callback' => '__return_true',
   ));
+
+  register_rest_route('lux/v1', '/report-product', array(
+    'methods'  => 'POST',
+    'callback' => 'lux_report_product',
+    'permission_callback' => '__return_true',
+  ));
 });
 
 add_filter('rest_prepare_product', function ($response, $post, $request) {
@@ -424,3 +430,26 @@ add_filter('woocommerce_rest_check_permissions', function ($permission, $context
   }
   return $permission;
 }, 10, 4);
+
+function lux_report_product(WP_REST_Request $request) {
+  if (!class_exists('WC_Product')) {
+    return new WP_Error('woocommerce_not_active', 'WooCommerce is not active', array('status' => 500));
+  }
+  $product_id = (int)$request->get_param('product_id');
+  $report_reason = $request->get_param('report_reason');
+
+  // var_dump($gallery_images);
+  if (!$product_id || !$report_reason) {
+    return new WP_Error('missing_params', 'Missing required parameters: Product id, Report Issue', array('status' => 400));
+  }
+  $admin_email = get_option('admin_email');
+
+  $subject = 'User Reported A Product';
+  
+  $message = 'Product ID: '.$product_id;
+  $message .= 'User ID: '.get_current_user_id();
+  $message .= 'Reason: '.$report_reason;
+
+  $headers = array('Content-Type: text/html; charset=UTF-8');
+  wp_mail($admin_email, $subject, $message, $headers);
+}
