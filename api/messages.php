@@ -148,6 +148,10 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
           'id' => (int)$conversation_id,
           'name' => $conversation_name,
           'image_url' => $image_url,
+          'conversation_user_ids' => [
+            $user_id, // sender
+            $other_conversation_user_id // receiver
+          ],
           'messages_unread_count' => (int)$messages_unread_count,
           'updated_at' => $conversation_data->updated_at,
           'created_at' => $conversation_data->created_at,
