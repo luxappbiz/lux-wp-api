@@ -446,9 +446,9 @@ function lux_report_product(WP_REST_Request $request) {
 
   $subject = 'User Reported A Product';
   
-  $message = 'Product ID: '.$product_id;
-  $message .= 'User ID: '.get_current_user_id();
-  $message .= 'Reason: '.$report_reason;
+  $message = 'Product ID: '.$product_id.' <br>';
+  $message .= 'User ID: '.get_current_user_id().' <br>';
+  $message .= 'Reason: '.$report_reason.' <br>';
 
   $headers = array('Content-Type: text/html; charset=UTF-8');
   wp_mail($admin_email, $subject, $message, $headers);
