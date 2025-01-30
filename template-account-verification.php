@@ -5,13 +5,7 @@
 
 get_header();
 
-function lux_verify_email_verification_code($code, $user_id = null) {
-  // if (!$user_id) {
-  //   if (!is_user_logged_in()) {
-  //     return false;
-  //   }
-  //   $user_id = get_current_user_id();
-  // }
+function lux_verify_email_verification_code($code) {
   $code = base64_decode($code);
   $code = unserialize($code);
 
@@ -31,11 +25,12 @@ function lux_verify_email_verification_code($code, $user_id = null) {
     <section id="verifcation-status" class="py-lg-5">
       <div class="row justify-content-center">
         <div class="col-auto text-center">
+          test
           <?php
-          $user_id = get_current_user_id();
           $verification_code = isset($_GET['code']) && $_GET['code'] ? $_GET['code'] : false;
+          $lux_verify_email_verification_code = lux_verify_email_verification_code($verification_code);
           if ($verification_code) { ?>
-            <?php if (lux_verify_email_verification_code($verification_code, $user_id)) { ?>
+            <?php if ($lux_verify_email_verification_code) { ?>
               <div class="fa-stack fa-lg mb-3">
                 <i class="fa fa-certificate fa-stack-2x" style="color: #1DA1F2;"></i>
                 <i class="fa fa-check fa-stack-1x fa-inverse text-white"></i>

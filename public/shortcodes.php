@@ -1,18 +1,16 @@
 <?php
 
 function lux_verification_status_func() {
-  function lux_shortcode_verify_email_verification_code($code, $user_id = null) {
-    if (!$user_id) {
-      if (!is_user_logged_in()) {
-        return false;
-      }
-      $user_id = get_current_user_id();
-    }
-    $email_verification_code = get_user_meta($user_id, 'email_verification_code', true);
+  function lux_shortcode_verify_email_verification_code($code) {
     $code = base64_decode($code);
-    $code = unserialize($code); // Notice: unserialize()
-    if ($code == $email_verification_code) {
-      update_user_meta($user_id, 'email_verified', true);
+    $code = unserialize($code);
+  
+    $users = get_users([
+      'meta_key' => 'email_verification_code',
+      'meta_value' => $code
+    ]);
+    if ($users && count($users) && $users[0]) {
+      update_user_meta($users[0]->ID, 'email_verified', true);
       return true;
     }
     return false;
@@ -23,10 +21,9 @@ function lux_verification_status_func() {
     <div class="row justify-content-center">
       <div class="col-auto text-center">
         <?php
-        $user_id = get_current_user_id();
         $verification_code = isset($_GET['code']) && $_GET['code'] ? $_GET['code'] : false;
         if ($verification_code) { ?>
-          <?php if (lux_shortcode_verify_email_verification_code($verification_code, $user_id)) { ?>
+          <?php if (lux_shortcode_verify_email_verification_code($verification_code)) { ?>
             <div class="fa-stack fa-lg mb-3">
               <i class="fa fa-certificate fa-stack-2x" style="color: #1DA1F2;"></i>
               <i class="fa fa-check fa-stack-1x fa-inverse text-white"></i>
