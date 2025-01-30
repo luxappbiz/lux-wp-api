@@ -80,3 +80,8 @@ register_nav_menus( array(
  * Public
  */
 require_once( $template_directory . '/public/woocommerce.php' );
+
+/*
+ * Shortcodes
+ */
+require_once( $template_directory . '/public/shortcodes.php' );

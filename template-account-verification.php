@@ -59,7 +59,7 @@ function lux_verify_email_verification_code($code, $user_id = null) {
           <?php } ?>
         </div>
       </div> 
-    </section>   
+    </section>
   </div>
 </main>
 <?php get_footer(); ?>
