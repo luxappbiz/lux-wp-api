@@ -50,7 +50,7 @@
             "name": "verification_email_template",
             "aria-label": "",
             "type": "wysiwyg",
-            "instructions": "",
+            "instructions": "Available Tags [user_name], [email], [verification_link]",
             "required": 0,
             "conditional_logic": 0,
             "wrapper": {
@@ -84,5 +84,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1738219433
+    "modified": 1738220060
 }
