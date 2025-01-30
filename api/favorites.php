@@ -27,7 +27,7 @@ add_action( 'rest_api_init', function () {
 });
 
 function lux_api_get_favorites( WP_REST_Request $request ) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $user_id = get_current_user_id();
   $favourite_products = get_user_meta($user_id, 'favourite_products', true);
   if (!$favourite_products) {
@@ -61,7 +61,7 @@ function lux_api_get_favorites( WP_REST_Request $request ) {
 }
 
 function lux_api_add_favorite( WP_REST_Request $request ) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $data = $request->get_body();
   $data = json_decode($data, true);
   if (!isset($data['product_id']) || $data['product_id'] == null) {
@@ -110,7 +110,7 @@ function lux_api_add_favorite( WP_REST_Request $request ) {
 }
 
 function lux_api_remove_favorite( WP_REST_Request $request ) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $data = $request->get_body();
   $data = json_decode($data, true);
 

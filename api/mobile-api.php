@@ -43,7 +43,7 @@ add_action( 'rest_api_init', function () {
 });
 
 function lux_api_register(WP_REST_Request $request) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
   $email = $body['email'];
@@ -62,7 +62,7 @@ function lux_api_register(WP_REST_Request $request) {
       'error' => 'Creating new user failed. ' . $user_id->get_error_message()
     ]);
   }
-  $sent_verification_email = lux_api_send_verification_email($new_user_id);
+  $sent_verification_email = lux_api_send_verification_email($user_id);
   add_user_meta($user->ID, 'terms_agreed_at', current_time('mysql'));
   $user = new WP_User($user_id);
   $user->set_role('customer');
@@ -154,7 +154,7 @@ function lux_api_send_verification_email($user_id) {
 }
 
 function lux_api_login(WP_REST_Request $request) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
   $login = $body['login'];
@@ -219,7 +219,7 @@ function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
 }
 
 function lux_mobile_app_update_user_func(WP_REST_Request $request) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $user_id = get_current_user_id();
   $new_display_name = sanitize_text_field($request->get_param('display_name'));
   $media_id = null;
@@ -285,7 +285,7 @@ function lux_mobile_app_update_user_func(WP_REST_Request $request) {
 }
 
 function lux_api_handle_forgot_password(WP_REST_Request $request) {
-  custom_rest_api_cors_headers();
+  lux_rest_api_cors_headers();
   $email = sanitize_email($request->get_param('email'));
   if (!is_email($email)) {
     return wp_send_json([
