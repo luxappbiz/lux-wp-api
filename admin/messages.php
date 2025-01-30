@@ -162,7 +162,10 @@ function lux_admin_conversations_page_content() {
                 </tr>
               </thead>
               <tbody>
-                <?php foreach($conversations as $key => $conversation) { ?>
+                <?php foreach($conversations as $key => $conversation) {
+                  $owner_name = get_user_meta($conversation->owner_user_id, 'first_name', true);
+                  $owner_name .= ' ' . get_user_meta($conversation->owner_user_id, 'last_name', true);
+                  ?>
                   <tr>
                     <td>
                       <a href="<?= $site_url ?>/wp-admin/admin.php?page=messages&conversation_id=<?= $conversation->id ?>">
@@ -170,7 +173,9 @@ function lux_admin_conversations_page_content() {
                       </a>
                     </td>
                     <td>
-                      <a href="<?= $$site_url . '/wp-admin/user-edit.php?user_id=' . $conversation->owner_user_id ?>"><?= $conversation->owner_user_id ?></a>
+                      <a href="<?= $site_url . '/wp-admin/user-edit.php?user_id=' . $conversation->owner_user_id ?>">
+                        <?= $$conversation->owner_user_id ?> <?= $owner_name ?>  
+                      </a>
                     </td>
                     <td><?= $conversation->name ?></td>
                     <td><?= $conversation->updated_at ?></td>
@@ -204,7 +209,10 @@ function lux_admin_conversations_page_content() {
                 </tr>
               </thead>
               <tbody>
-                <?php foreach($messages as $key => $message) { ?>
+                <?php foreach($messages as $key => $message) {
+                  $user_name = get_user_meta($message->user_id, 'first_name', true);
+                  $user_name .= ' ' . get_user_meta($message->user_id, 'last_name', true);
+                  ?>
                   <tr>
                     <td><?= $message->id ?></td>
                     <td>
@@ -213,7 +221,9 @@ function lux_admin_conversations_page_content() {
                       </a>
                     </td>
                     <td>
-                      <a href="<?= $$site_url . '/wp-admin/user-edit.php?user_id=' . $message->user_id ?>"><?= $message->user_id ?></a>
+                      <a href="<?= $$site_url . '/wp-admin/user-edit.php?user_id=' . $message->user_id ?>">
+                        <?= $message->user_id ?> <? $user_name ?>
+                      </a>
                     </td>
                     <td><?= $message->message ?></td>
                     <td><?= $message->attachment_id ?></td>
