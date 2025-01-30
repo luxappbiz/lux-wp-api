@@ -6,17 +6,21 @@
 get_header();
 
 function lux_verify_email_verification_code($code, $user_id = null) {
-  if (!$user_id) {
-    if (!is_user_logged_in()) {
-      return false;
-    }
-    $user_id = get_current_user_id();
-  }
-  $email_verification_code = get_user_meta($user_id, 'email_verification_code', true);
-  $code = base64_decode($code);
-  $code = unserialize($code); // Notice: unserialize()
-  if ($code == $email_verification_code) {
-    update_user_meta($user_id, 'email_verified', true);
+  // if (!$user_id) {
+  //   if (!is_user_logged_in()) {
+  //     return false;
+  //   }
+  //   $user_id = get_current_user_id();
+  // }
+  $code = serialize($code); // Notice: unserialize()
+  $code = base64_encode($code);
+
+  $users = get_users([
+    'meta_key' => 'email_verification_code',
+    'meta_value' => $code
+  ]);
+  if ($users && count($users) && $users[0]) {
+    update_user_meta($users[0]->ID, 'email_verified', true);
     return true;
   }
   return false;
