@@ -62,6 +62,7 @@ function lux_api_register(WP_REST_Request $request) {
       'error' => 'Creating new user failed. ' . $user_id->get_error_message()
     ]);
   }
+  $sent_verification_email = lux_api_send_verification_email($new_user_id);
   add_user_meta($user->ID, 'terms_agreed_at', current_time('mysql'));
   $user = new WP_User($user_id);
   $user->set_role('customer');
@@ -102,8 +103,57 @@ function lux_create_unique_username_by_email($email) {
   return $username;
 }
 
-function lux_api_login(WP_REST_Request $request)
-{
+function lux_createRandStr($strLength) {
+  //specify characters to be used in generating random string, do not specify any characters that wordpress does not allow in the creation.
+  $characters = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_[]{}!@$%^*().,>=-;|:?";
+  //get the total length of specified characters to be used in generating random string
+  $charactersLength = strlen($characters);
+  //declare a string that we will use to create the random string 
+  $randomString = '';
+  for ($i = 0; $i < $strLength; $i++) {
+    //generate random characters
+    $randomCharacter = $characters[rand(0, $charactersLength - 1)];
+    //add the random characters to the random string
+    $randomString .= $randomCharacter;
+  };
+  //sanitize_user, just in case 
+  $sanRandomString = sanitize_user($randomString);
+  //check that random string contains Uppercase/Lowercase/Intergers/Special Char and that it is the correct length
+  if ( (preg_match('([a-zA-Z].*[0-9]|[0-9].*[a-zA-Z].*[_\W])', $sanRandomString)==1) && (strlen($sanRandomString)==$strLength) ) {
+    //return the random string if it meets the complexity criteria 
+    return $sanRandomString;
+  } else {
+    // if the random string does not meet minimium criteria call function again 
+    return call_user_func("lux_createRandStr", ($strLength));
+  }
+}
+
+function lux_api_send_verification_email($user_id) {
+  if (!$user_id) {
+    $user_id = get_current_user_id();
+  }
+  $user = get_userdata($user_id);
+  $user_data = $user->data;
+  $code = lux_createRandStr(42); // check does func exist?
+  update_user_meta($user_id, 'email_verified', false);
+  update_user_meta($user_id, 'email_verification_code', $code);
+  update_user_meta($user_id, 'email_verification_code_generation_time', time());
+  $email_code_verification_page_link  = get_field('email_code_verification_page_link', 'option');
+  $url = $email_code_verification_page_link . '?code=' . base64_encode(serialize($code));
+  $body = get_field('verification_email_template', 'option');
+  $tags_to_replace = [
+    '[user_name]' => $user_data->display_name,
+    '[email]' => $user_data->user_email,
+    '[verification_link]' => "<a href='$url'>$url</a>"
+  ];
+  foreach ($tags_to_replace as $key => $value) {
+    $body = str_replace($key, $value, $body);
+  }
+  $headers = array('Content-Type: text/html; charset=UTF-8');
+  return wp_mail($user_data->user_email, 'LUX Email Verification', $body, $headers);
+}
+
+function lux_api_login(WP_REST_Request $request) {
   custom_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
@@ -126,7 +176,6 @@ function lux_api_login(WP_REST_Request $request)
   $user->data->user_pass = null;
   add_user_meta($user->ID, 'app_access_tokens', $generated_token);
   $application_password = WP_Application_Passwords::create_new_application_password($user->ID, array('name' => 'lux-mobile-app'));
-
   wp_send_json([
     'success' => true,
     'user' => $user->data,
