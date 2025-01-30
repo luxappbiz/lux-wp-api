@@ -12,8 +12,8 @@ function lux_verify_email_verification_code($code, $user_id = null) {
   //   }
   //   $user_id = get_current_user_id();
   // }
-  $code = serialize($code); // Notice: unserialize()
-  $code = base64_encode($code);
+  $code = base64_decode($code);
+  $code = unserialize($code);
 
   $users = get_users([
     'meta_key' => 'email_verification_code',
