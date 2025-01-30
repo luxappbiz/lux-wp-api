@@ -1,0 +1,23 @@
+{
+    "key": "ui_options_page_679b1fa5334a1",
+    "title": "Settings",
+    "active": true,
+    "menu_order": 0,
+    "page_title": "Settings",
+    "menu_slug": "settings",
+    "parent_slug": "none",
+    "advanced_configuration": false,
+    "icon_url": "",
+    "menu_title": "",
+    "position": null,
+    "redirect": false,
+    "description": "",
+    "menu_icon": [],
+    "update_button": "Update",
+    "updated_message": "Options Updated",
+    "capability": "edit_posts",
+    "data_storage": "options",
+    "post_id": "",
+    "autoload": false,
+    "modified": 1738219429
+}
