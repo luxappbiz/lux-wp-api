@@ -310,8 +310,15 @@ function lux_api_get_conversation_messages( WP_REST_Request $request ) {
       'message' => 'Conversation not found.'
     ), 404);
   }
+  // Select Messages
   $table = $wpdb->prefix . 'lux_messages';
-  $sql = "SELECT * FROM $table WHERE conversation_id = $conversation_id ORDER BY created_at ASC";
+  $limit = 50;
+  $page = isset($_GET['page']) ? absint($_GET['page']) : 1;
+  $offset = $page ? ($page - 1) * $limit : false;
+  $sql = "SELECT * FROM $table WHERE conversation_id = $conversation_id ORDER BY created_at DESC LIMIT $limit";
+  if ($offset) {
+    $sql .= " OFFSET $offset";
+  }
   $messages_data = $wpdb->get_results($sql);
   $messages = array();
   if (!empty($messages_data)) {
@@ -351,6 +358,7 @@ function lux_api_get_conversation_messages( WP_REST_Request $request ) {
     'user_id' => $user_id, 
     'messages' => $messages,
     'messages_marked_read' => $messages_marked_read,
+    '$sql' => $sql,
   ), 201); 
 }
 
