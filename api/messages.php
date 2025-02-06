@@ -313,7 +313,7 @@ function lux_api_get_conversation_messages( WP_REST_Request $request ) {
   // Select Messages
   $table = $wpdb->prefix . 'lux_messages';
   $limit = 50;
-  $page = isset($_GET['page']) ? absint($_GET['page']) : 1;
+  $page = isset($_GET['paged']) ? absint($_GET['paged']) : 1;
   $offset = $page ? ($page - 1) * $limit : false;
   $sql = "SELECT * FROM $table WHERE conversation_id = $conversation_id ORDER BY created_at DESC LIMIT $limit";
   if ($offset) {
