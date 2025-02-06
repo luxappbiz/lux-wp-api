@@ -11,7 +11,7 @@ add_action('admin_init', function () {
         id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
         owner_user_id INT(11) UNSIGNED NOT NULL,
         name TEXT NOT NULL,
-        deleted_at TIMESTAMP DEFAULT NULL,
+        deleted_at TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       ) $charset_collate;";
@@ -68,7 +68,7 @@ add_action('admin_init', function () {
         conversation_id INT(11) UNSIGNED NOT NULL,
         message_id INT(11) UNSIGNED NOT NULL,
         user_id INT(11) UNSIGNED NOT NULL,
-        read_at TIMESTAMP DEFAULT NULL
+        read_at TIMESTAMP
       ) $charset_collate;";
       require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
       dbDelta($sql);
