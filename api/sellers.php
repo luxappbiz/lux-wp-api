@@ -148,7 +148,7 @@ function lux_api_get_seller_blocked( WP_REST_Request $request ) {
   return new WP_REST_Response(array(
     'success' => true,
     'blocked' => $blocked,
-  ), 200);  
+  ), 200);
 }
 
 // Update Seller's Blocked Users

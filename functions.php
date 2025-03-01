@@ -10,11 +10,38 @@ add_action( 'wp_enqueue_scripts', function () {
 }, 20 );
 */
 
+add_action('wp_enqueue_scripts', function () {
+  // Enqueue Bootstrap 4.6.2 CSS
+  wp_enqueue_style(
+    'bootstrap-css',
+    'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css',
+    array(),
+    '4.6.2',
+    'all'
+  );
+  // Enqueue jQuery (required for Bootstrap JS, already included in WordPress)
+  wp_enqueue_script('jquery');
+  // Enqueue Bootstrap 4.6.2 JS ( Popper.js is a dependency for Bootstrap JS)
+  wp_enqueue_script(
+    'popper-js',
+    'https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js',
+    array('jquery'),
+    '2.11.8',
+    true
+  );
+  wp_enqueue_script(
+    'bootstrap-js',
+    'https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js',
+    array('jquery', 'popper-js'),
+    '4.6.2',
+    true
+  );
+});
+
 $template_directory = get_template_directory();
 // $get_template_directory_uri = get_template_directory_uri();
 
-function lux_create_attachment($file, $url, $post_id = null)
-{
+function lux_create_attachment($file, $url, $post_id = null) {
   $filetype = wp_check_filetype($file);
   $attachment = array(
     'guid'           => $url,
