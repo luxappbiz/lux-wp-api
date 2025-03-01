@@ -16,12 +16,18 @@ get_header();
   row-gap: 1rem;
 }
 .lux-product-card {
-  text-decoration: none; color: inherit;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid silver;
+  border-radius: 0.25rem;
 }
 .lux-product-card .product-image {
   width: 100%;
   height: 12rem;
   overflow: hidden;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
 }
 .lux-product-card .product-image img {
   width: 100%;
@@ -29,7 +35,11 @@ get_header();
   object-fit: cover;
   margin-bottom: 0.5rem;
 }
+.lux-product-card_body {
+  padding: 0.5rem;
+}
 .product-title {
+  font-size: 1rem;
   font-family: "Playfair Display", Sans-serif;
   margin-bottom: 0.5rem;
 }
@@ -90,26 +100,9 @@ get_header();
             <div class="lux-products-grid row">
               <?php while ($products->have_posts()) {
                 $products->the_post();
-                global $product;
-                // Get product details
-                $product_permalink = get_permalink();
-                $product_title = get_the_title();
-                $product_price = $product->get_price_html();
-                $product_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'medium'); // Medium size for featured image
-                // Output product card
                 ?>
                 <div class="col-xl-3 col-lg-4">
-                  <a href="<?php echo esc_url($product_permalink); ?>" class="lux-product-card" style="text-decoration: none; color: inherit;">
-                    <div class="product-image">
-                      <?php if ($product_image) : ?>
-                        <img src="<?php echo esc_url($product_image[0]); ?>" alt="<?php echo esc_attr($product_title); ?>"/>
-                      <?php else : ?>
-                        <img src="<?php echo wc_placeholder_img_src(); ?>" alt="<?= the_title_attribute() ?>"/>
-                      <?php endif; ?>
-                    </div>
-                    <h3 class="product-title"><?php echo esc_html($product_title); ?></h3>
-                    <div class="product-price"><?php echo $product_price; ?></div>
-                  </a>
+                  <?php get_template_part('partials/product', 'card'); ?>
                 </div>
               <?php } ?>
             </div>
