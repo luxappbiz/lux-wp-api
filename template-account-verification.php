@@ -25,7 +25,6 @@ function lux_verify_email_verification_code($code) {
     <section id="verifcation-status" class="py-lg-5">
       <div class="row justify-content-center">
         <div class="col-auto text-center">
-          test
           <?php
           $verification_code = isset($_GET['code']) && $_GET['code'] ? $_GET['code'] : false;
           $lux_verify_email_verification_code = lux_verify_email_verification_code($verification_code);
