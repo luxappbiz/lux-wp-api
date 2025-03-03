@@ -1,11 +1,26 @@
 <?php
 /**
- * Taxonomy Template for Product Categories (product_cat)
+ * The Template for displaying products in a product category. Simply includes the archive template
  *
- * Displays products in a 4x4 grid with custom LUX product cards.
+ * This template can be overridden by copying it to yourtheme/woocommerce/taxonomy-product-cat.php.
+ *
+ * HOWEVER, on occasion WooCommerce will need to update template files and you
+ * (the theme developer) will need to copy the new files to your theme to
+ * maintain compatibility. We try to do this as little as possible, but it does
+ * happen. When this occurs the version of the template file will be bumped and
+ * the readme will list any important changes.
+ *
+ * @see         https://woocommerce.com/document/template-structure/
+ * @package     WooCommerce\Templates
+ * @version     4.7.0
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+  exit;
+}
+
 get_header('shop');
-// Get the current product category term
+
 $term = get_queried_object();
 ?>
 <style>
@@ -63,46 +78,15 @@ $term = get_queried_object();
     do_action('woocommerce_archive_description');
     ?>
   </header>
-  */ ?>
   <div><? the_content(); ?></div>
+  */ ?>
   <?php if (!is_user_logged_in()) { ?>
-    <style>
-    .woocommerce .col2-set .col-1,
-    .woocommerce-page .col2-set .col-1 {
-      float: left;
-      width: 48%;
-      max-width: initial;
-    }
-    .woocommerce .col2-set .col-2,
-    .woocommerce-page .col2-set .col-2 {
-      float: right;
-      width: 48%;
-      max-width: initial;
-    }
-    .woocommerce form .form-row .password-input {
-      width: 100%;
-    }
-    .woocommerce form .form-row {
-      display: flex;
-      flex-direction: column;
-    }
-    .woocommerce-form .woocommerce-button {
-      display: block;
-      width: 100%;
-      margin: 0;
-      background-color: black !important;
-      color: white !important;
-      font-family: "Playfair Display", Sans-serif;
-    }
-    </style>
-    <section class="container py-3 py-lg-5">
-      <?php echo do_shortcode('[woocommerce_my_account]'); ?>      
-    </section>
-    <?php } else { ?>
+    <?php get_template_part('partials/account', 'login'); ?>
+  <?php } else { ?>
+    <?php get_template_part('partials/taxonomy-page-header'); ?>
     <?php if (woocommerce_product_loop()) { ?>
       <section class="container py-3 py-lg-5">
         <?php
-        // Custom query to ensure 16 products (4x4 grid)
         $args = array(
           'post_type'      => 'product',
           'posts_per_page' => 16,
@@ -121,7 +105,7 @@ $term = get_queried_object();
             <?php while ($products->have_posts()) {
               $products->the_post();
               ?>
-              <div class="col-xl-3 col-lg-4">
+              <div class="col-xl-3 col-lg-4 col-md-6">
                 <?php get_template_part('partials/product', 'card'); ?>
               </div>
             <?php } ?>

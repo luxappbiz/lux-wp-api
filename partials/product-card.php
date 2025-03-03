@@ -3,7 +3,7 @@ global $product;
 $product_permalink = get_permalink();
 $product_title = get_the_title();
 $product_price = $product->get_price_html();
-$product_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'medium'); // Medium size for featured image
+$product_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full'); // Medium size for featured image
 ?>
 <a href="<?php echo esc_url($product_permalink); ?>" class="lux-product-card">
   <div class="product-image">
