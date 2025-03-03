@@ -1,13 +1,31 @@
 <?php
 /**
- * Taxonomy Template for Product Categories (product_cat)
+ * The Template for displaying products in a product category. Simply includes the archive template
  *
- * Displays products in a 4x4 grid with custom LUX product cards.
+ * This template can be overridden by copying it to yourtheme/woocommerce/taxonomy-product-cat.php.
+ *
+ * HOWEVER, on occasion WooCommerce will need to update template files and you
+ * (the theme developer) will need to copy the new files to your theme to
+ * maintain compatibility. We try to do this as little as possible, but it does
+ * happen. When this occurs the version of the template file will be bumped and
+ * the readme will list any important changes.
+ *
+ * @see         https://woocommerce.com/document/template-structure/
+ * @package     WooCommerce\Templates
+ * @version     4.7.0
  */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+?>
+
+<?php
 get_header('shop');
 // Get the current product category term
 $term = get_queried_object();
 ?>
+asfsafasfasfasfsf
 <style>
 /*.lux-products-grid {
   display: grid;
@@ -141,6 +159,7 @@ $term = get_queried_object();
       do_action('woocommerce_no_products_found');
     } ?>
   <?php } ?>
+  asfsafasfasfasfsf
 </div>
 <?php
 get_footer('shop');
