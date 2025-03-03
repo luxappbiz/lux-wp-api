@@ -16,13 +16,22 @@
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
+<<<<<<< HEAD:woocommerce/taxonomy-product_cat.php
   exit;
 }
 
+=======
+	exit;
+}
+?>
+
+<?php
+>>>>>>> 2e1f122193172b76a2ae09ade32db060354439f2:woocommerce/taxonomy-product-cat.php
 get_header('shop');
 
 $term = get_queried_object();
 ?>
+asfsafasfasfasfsf
 <style>
 /*.lux-products-grid {
   display: grid;
@@ -125,6 +134,7 @@ $term = get_queried_object();
       do_action('woocommerce_no_products_found');
     } ?>
   <?php } ?>
+  asfsafasfasfasfsf
 </div>
 <?php
 get_footer('shop');
