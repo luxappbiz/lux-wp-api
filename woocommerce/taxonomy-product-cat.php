@@ -80,10 +80,10 @@ $term = get_queried_object();
   </header>
   <div><? the_content(); ?></div>
   */ ?>
+  <?php get_template_part('partials/taxonomy-page-header'); ?>
   <?php if (!is_user_logged_in()) { ?>
     <?php get_template_part('partials/account', 'login'); ?>
   <?php } else { ?>
-    <?php get_template_part('partials/taxonomy-page-header'); ?>
     <?php if (woocommerce_product_loop()) { ?>
       <section class="container py-3 py-lg-5">
         <?php
