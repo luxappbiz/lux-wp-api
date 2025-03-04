@@ -80,6 +80,8 @@ function lux_rest_api_cors_headers() {
 /*
  * API
  */
+require_once( $template_directory . '/api/helpers.php' );
+
 require_once( $template_directory . '/api/products.php' );
 
 // require_once( $template_directory . '/api/vendors.php' );

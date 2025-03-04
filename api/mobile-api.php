@@ -176,6 +176,7 @@ function lux_api_login(WP_REST_Request $request) {
   $user->data->user_pass = null;
   add_user_meta($user->ID, 'app_access_tokens', $generated_token);
   $application_password = WP_Application_Passwords::create_new_application_password($user->ID, array('name' => 'lux-mobile-app'));
+  $user->data->unread_messages_count = lux_api_helper_get_total_unread_messages_count($user->ID);
   wp_send_json([
     'success' => true,
     'user' => $user->data,
