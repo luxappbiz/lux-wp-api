@@ -64,6 +64,8 @@ require_once( $template_directory . '/admin/admin.php' );
 
 require_once( $template_directory . '/admin/messages.php' );
 
+require_once( $template_directory . '/admin/push-notifications.php' );
+
 function lux_rest_api_cors_headers() {
   header('Access-Control-Allow-Origin: *');
   header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
