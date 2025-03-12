@@ -23,51 +23,7 @@ get_header('shop');
 
 $term = get_queried_object();
 ?>
-<style>
-/*.lux-products-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 1rem;
-  max-width: 1200px;
-  margin: 0 auto;
-}*/
-.lux-products-grid {
-  row-gap: 1rem;
-}
-.lux-product-card {
-  display: block;
-  text-decoration: none;
-  color: inherit;
-  border: 1px solid silver;
-  border-radius: 0.25rem;
-}
-.lux-product-card .product-image {
-  width: 100%;
-  height: 12rem;
-  overflow: hidden;
-  border-top-left-radius: 0.25rem;
-  border-top-right-radius: 0.25rem;
-}
-.lux-product-card .product-image img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  margin-bottom: 0.5rem;
-}
-.lux-product-card_body {
-  padding: 0.5rem;
-}
-.product-title {
-  font-size: 1rem;
-  font-family: "Playfair Display", Sans-serif;
-  margin-bottom: 0.5rem;
-}
-.product-price {
-  font-size: 0.75rem;
-  color: silver;
-}
-</style>
-<div class="lux-products-grid-container">
+<main class="lux-products-grid-container">
   <?php /*
   <header class="woocommerce-products-header">
     <?php if (apply_filters('woocommerce_show_page_title', true)) : ?>
@@ -125,7 +81,7 @@ $term = get_queried_object();
       do_action('woocommerce_no_products_found');
     } ?>
   <?php } ?>
-</div>
+</main>
 <?php
 get_footer('shop');
 ?>

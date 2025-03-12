@@ -1,3 +1,6 @@
+<?php
+$queried_object = get_queried_object();
+?>
 <style>
 .elementor-797 .elementor-element.elementor-element-1e00271 {
   --display: flex;
@@ -47,7 +50,7 @@
 <iframe class="elementor-background-video-embed" frameborder="0" allowfullscreen="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" title="BUGATTI CHIRON Pur Sport: ‘C’ the Drift" width="640" height="360" src="https://www.youtube.com/embed/NMThdHhrLoM?controls=0&amp;rel=0&amp;playsinline=1&amp;cc_load_policy=0&amp;enablejsapi=1&amp;origin=https%3A%2F%2Fluxapp.biz&amp;widgetid=1" id="widget2" style="width: 1134px; height: 637.875px;"></iframe>
 </div>    <div class="elementor-element elementor-element-b0be37f elementor-widget elementor-widget-heading" data-id="b0be37f" data-element_type="widget" data-widget_type="heading.default">
 <div class="elementor-widget-container">
-<h2 class="elementor-heading-title elementor-size-default">Category: Real Estate</h2></div>
+<h2 class="elementor-heading-title elementor-size-default"><?= $queried_object->name ?></h2></div>
 </div>
 <div class="elementor-element elementor-element-6851d98 elementor-widget elementor-widget-text-editor" data-id="6851d98" data-element_type="widget" data-widget_type="text-editor.default">
 <div class="elementor-widget-container text-center text-white">Curated by Members Like You</div>
