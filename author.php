@@ -45,19 +45,21 @@ $seller_image_url = wp_get_attachment_url($seller_image_id);
   	</section>
     <section>
 	    <div class="container py-3 py-lg-5">
-
-				<ul class="nav nav-pills">
-				  <li class="nav-item">
-				    <a class="nav-link active" href="#">All</a>
-				  </li>
-				  <li class="nav-item">
-				    <a class="nav-link" href="#">In Review</a>
-				  </li>
-				  <li class="nav-item">
-				    <a class="nav-link" href="#">Sold</a>
-				  </li>
-				</ul>
-
+	    	<div class="row justify-content-center mb-3">
+	    		<div class="col-auto">
+						<ul id="lux-products-filters" class="nav nav-pills">
+						  <li class="nav-item">
+						    <a class="nav-link active" href="#" filter="all">All</a>
+						  </li>
+						  <li class="nav-item">
+						    <a class="nav-link" href="#" filter="draft">In Review</a>
+						  </li>
+						  <li class="nav-item">
+						    <a class="nav-link" href="#" filter="sold">Sold</a>
+						  </li>
+						</ul>	    			
+	    		</div>
+	    	</div>
 	    	<?php
         $args = array(
           'post_type'      => 'product',
@@ -72,7 +74,7 @@ $seller_image_url = wp_get_attachment_url($seller_image_id);
             <?php while ($products->have_posts()) {
               $products->the_post();
               ?>
-              <div class="col-xl-3 col-lg-4">
+              <div class="lux-product-col col-xl-3 col-lg-4">
                 <?php get_template_part('partials/product', 'card'); ?>
               </div>
             <?php } ?>
@@ -88,4 +90,31 @@ $seller_image_url = wp_get_attachment_url($seller_image_id);
     </section>
   <?php } ?>
 </main>
+<script type="text/javascript">
+(function($) {
+$(document).ready(function() {
+$('#lux-products-filters a.nav-link').on('click', function() {
+	const $btn = $(this)
+	if ($btn.hasClass('active')) {
+		return
+	}
+	$('#lux-products-filters a').removeClass('active')
+	const filter_status = $btn.attr('filter')
+	if (filter_status == 'all') {
+		$('.lux-product-col').show()
+	} else {
+		$('.lux-product-card').each(function() {
+			const status = $(this).attr('data-status')
+			if (filter_status == status) {
+				$(this).parent().show()
+			} else {
+				$(this).parent().hide()
+			}
+		})		
+	}
+	$btn.addClass('active')
+})
+})
+})(jQuery)
+</script>
 <?php get_footer(); ?>
