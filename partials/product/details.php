@@ -44,7 +44,7 @@ $author_url = get_author_posts_url($author_id);
 								<span class="sr-only">Message</span>
 							</button>
 						<?php } else { ?>
-							<button type="button" class="btn btn-transparent" data-toggle="modal" data-target="#membershipRequiredModal">
+							<button type="button" class="btn btn-transparent" data-toggle="modal" data-target="#membershipUnlockModal">
 								<i class="fa-chat-bubbles" aria-hidden="true"></i>
 								<span class="sr-only">Message</span>
 							</button>

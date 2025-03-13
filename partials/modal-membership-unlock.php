@@ -1,5 +1,5 @@
 
-<div class="modal fade" id="membershipRequiredModal" tabindex="-1" aria-labelledby="membershipRequiredModalLabel" aria-hidden="true">
+<div class="modal fade" id="membershipUnlockModal" tabindex="-1" aria-labelledby="membershipUnlockModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">

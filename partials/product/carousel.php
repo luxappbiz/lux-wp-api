@@ -37,7 +37,8 @@ if (empty($all_image_ids)) {
 }
 #productCarousel .carousel-item img {
 	position: relative;
-  height: calc(100vh - 10rem);
+	/* height: calc(100vh - 10rem); */
+	/* height: calc(100vh - 8rem); */
   object-fit: contain;
   z-index: 1;
 }
