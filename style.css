@@ -4,7 +4,7 @@ Theme URI: https://luxapp.biz
 Author: Estrada Enterprises LLC
 Author URI: https://estradaenterprises.biz
 Description: LUX API WordPress Theme
-Version: 0.1.2
+Version: 0.1.3
 License: GNU General Public License v2+
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: lux
@@ -67,6 +67,59 @@ input[type='submit'].dokan-btn-theme, a.dokan-btn-theme, .dokan-btn-theme {
 .mf-product-detail a {
   color: white !important;
   text-decoration: underline;
+}
+
+.woocommerce .woocommerce-breadcrumb {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+#productCarousel .carousel-item {
+  position: relative;
+}
+
+#productCarousel .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
+  z-index: 1;
+}
+
+#productCarousel .carousel-item_bg-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(0.25rem); /* Apply blur effect */
+  -webkit-filter: blur(0.25rem); /* For browser compatibility */
+  transform: scale(1.1); /* Slight scale to avoid edges */
+}
+
+#productCarousel .carousel-item img {
+  position: relative;
+  height: calc(100vh - 8rem);
+  object-fit: contain;
+  z-index: 1;
+}
+
+#single-product-details .author-img {
+  height: 5rem;
+  width: 5rem;
+  object-fit: cover;
+  border-radius: 0.25rem;
+}
+
+.single-product-seller {
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  border: 1px solid silver;
 }
 
 /*

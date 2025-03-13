@@ -9,40 +9,6 @@ if (empty($all_image_ids)) {
   return; // No images to display
 }
 ?>
-<style>
-#productCarousel .carousel-item {
-	position: relative;
-}
-#productCarousel .overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5); /* Semi-transparent black overlay */
-  z-index: 1;
-}
-#productCarousel .carousel-item_bg-img {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  filter: blur(0.25rem); /* Apply blur effect */
-  -webkit-filter: blur(0.25rem); /* For browser compatibility */
-  transform: scale(1.1); /* Slight scale to avoid edges */
-}
-#productCarousel .carousel-item img {
-	position: relative;
-	/* height: calc(100vh - 10rem); */
-	/* height: calc(100vh - 8rem); */
-  object-fit: contain;
-  z-index: 1;
-}
-</style>
 <section id="single-product-carousel">
 	<div id="productCarousel" class="carousel slide" data-ride="carousel">
 	  <ol class="carousel-indicators">

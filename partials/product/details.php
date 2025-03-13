@@ -34,18 +34,18 @@ $author_url = get_author_posts_url($author_id);
 					<div>
 						<span>Listed by</span>
 						<h3 class="fs-1.5x m-0">
-							<a href="<?= $author_url ?>" class="d-block"><?= $author_name ?></a>
+							<a href="<?= $author_url ?>" class="d-block text-black"><?= $author_name ?></a>
 						</h3>
 					</div>
 					<div>
 						<?php if ($membership_subscription_id) { ?>
 							<button type="button" class="btn btn-transparent" onclick="alert('To do: navigate to messages')">
-								<i class="fa-chat-bubbles" aria-hidden="true"></i>
+								<img src="<?= get_template_directory_uri() ?>/assets/icons/comments.svg" alt="Comments" style="height: 1.5rem;"/>
 								<span class="sr-only">Message</span>
 							</button>
 						<?php } else { ?>
 							<button type="button" class="btn btn-transparent" data-toggle="modal" data-target="#membershipUnlockModal">
-								<i class="fa-chat-bubbles" aria-hidden="true"></i>
+								<img src="<?= get_template_directory_uri() ?>/assets/icons/comments.svg" alt="Comments" style="height: 1.5rem;"/>
 								<span class="sr-only">Message</span>
 							</button>
 						<?php } ?>

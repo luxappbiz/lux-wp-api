@@ -20,23 +20,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header( 'shop' ); ?>
-	<style>
-	.woocommerce .woocommerce-breadcrumb {
-		padding-left: 1rem;
-		padding-right: 1rem;
-	}
-	#single-product-details .author-img {
-	  height: 5rem;
-	  width: 5rem;
-		object-fit: cover;
-		border-radius: 0.25rem;
-	}
-	.single-product-seller {
-		padding: 0.25rem;
-		border-radius: 0.25rem;
-		border: 1px solid silver;
-	}
-	</style>
 	<main class="lux-single-product-container">
 		<?php
 		/**
