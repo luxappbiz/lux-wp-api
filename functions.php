@@ -19,6 +19,13 @@ add_action('wp_enqueue_scripts', function () {
     '4.6.2',
     'all'
   );
+  wp_enqueue_style(
+    'lux-theme-css',
+    get_template_directory_uri() . '/style.css',
+    array(),
+    '0.0.1',
+    'all'
+  );
   // Enqueue jQuery (required for Bootstrap JS, already included in WordPress)
   wp_enqueue_script('jquery');
   // Enqueue Bootstrap 4.6.2 JS ( Popper.js is a dependency for Bootstrap JS)

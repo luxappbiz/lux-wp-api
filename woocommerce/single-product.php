@@ -20,6 +20,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header( 'shop' ); ?>
+<style>
+.woocommerce .woocommerce-breadcrumb {
+	padding-left: 1rem;
+	padding-right: 1rem;
+}
+</style>
 	<main class="lux-single-product-container">
 		<?php
 			/**
@@ -34,6 +40,7 @@ get_header( 'shop' ); ?>
 				<?php the_post(); ?>
 				<?php // wc_get_template_part( 'content', 'single-product' ); ?>
 			  <?php get_template_part('partials/product/carousel'); ?>
+			  <?php get_template_part('partials/product/details'); ?>
 			<?php endwhile; // end of the loop. ?>
 		<?php
 			/**
