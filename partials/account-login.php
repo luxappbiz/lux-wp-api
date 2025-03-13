@@ -2,15 +2,26 @@
 <style>
 .woocommerce .col2-set .col-1,
 .woocommerce-page .col2-set .col-1 {
-  float: left;
-  width: 48%;
   max-width: initial;
 }
+
 .woocommerce .col2-set .col-2,
 .woocommerce-page .col2-set .col-2 {
-  float: right;
-  width: 48%;
   max-width: initial;
+}
+
+@media (min-width: 992px) {
+  .woocommerce .col2-set .col-1,
+  .woocommerce-page .col2-set .col-1 {
+    float: left;
+    width: 48%;
+  }
+
+  .woocommerce .col2-set .col-2,
+  .woocommerce-page .col2-set .col-2 {
+    float: right;
+    width: 48%;
+  }      
 }
 .woocommerce form .form-row .password-input {
   width: 100%;

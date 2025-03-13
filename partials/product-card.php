@@ -3,9 +3,13 @@ global $product;
 $product_permalink = get_permalink();
 $product_title = get_the_title();
 $product_price = $product->get_price_html();
-$product_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full'); // Medium size for featured image
+$product_image = wp_get_attachment_image_src(get_post_thumbnail_id(), 'full');
+$is_sold_out = !$product->is_in_stock();
 ?>
 <a href="<?php echo esc_url($product_permalink); ?>" class="lux-product-card">
+  <?php if ($is_sold_out) { ?>
+    <span class="badge badge-sold">SOLD</span>
+  <?php } ?>
   <div class="product-image">
     <?php if ($product_image) : ?>
       <img src="<?php echo esc_url($product_image[0]); ?>" alt="<?php echo esc_attr($product_title); ?>"/>

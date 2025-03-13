@@ -7,8 +7,15 @@ get_header();
 
 $seller = get_queried_object();
 $seller_image_id = get_user_option('metronet_image_id', $seller->ID);
-$seller_image_url = wp_get_attachment_url($author_image_id);
+$seller_image_url = wp_get_attachment_url($seller_image_id);
 ?>
+<style>
+.seller-img {
+	height: 6rem;
+	width: 6rem;
+	border-radius: 50%;
+}
+</style>
 <main id="main" class="site-main">
   <?php if (!is_user_logged_in()) { ?>
     <section class="container py-3 py-lg-5">
@@ -23,25 +30,41 @@ $seller_image_url = wp_get_attachment_url($author_image_id);
 							<img src="<?= $seller_image_url ?>" class="seller-img" alt="<?= $seller->display_name ?>"/>
 						</div>
 					<?php } ?>
-  				<div class="col">
-		  			<h1 class="seller-name"><?php echo esc_html($seller->display_name); ?></h1>
-		        <?php if ($seller->description) : ?>
-		          <div class="seller-bio">
-		            <?php echo wpautop(esc_html($seller->description)); ?>
-		          </div>
-		        <?php endif; ?>  					
+  				<div class="col d-flex align-items-center">
+  					<div>
+			  			<h1 class="seller-name fs-1.5x"><?php echo esc_html($seller->display_name); ?></h1>
+			        <?php if ($seller->description) : ?>
+			          <div class="seller-bio">
+			            <?php echo wpautop(esc_html($seller->description)); ?>
+			          </div>
+			        <?php endif; ?>  						
+  					</div>
   				</div>
   			</div>
   		</div>
   	</section>
     <section>
 	    <div class="container py-3 py-lg-5">
+
+				<ul class="nav nav-pills">
+				  <li class="nav-item">
+				    <a class="nav-link active" href="#">All</a>
+				  </li>
+				  <li class="nav-item">
+				    <a class="nav-link" href="#">In Review</a>
+				  </li>
+				  <li class="nav-item">
+				    <a class="nav-link" href="#">Sold</a>
+				  </li>
+				</ul>
+
 	    	<?php
         $args = array(
           'post_type'      => 'product',
-          'posts_per_page' => 16, // 4x4 grid, adjust as needed
+          'posts_per_page' => 16,
           'post_status'    => 'publish',
           'author'         => $seller->ID, // Filter by this author/seller
+          'post__not_in'   => [482],
         );
         $products = new WP_Query($args);
         if ($products->have_posts()) { ?>

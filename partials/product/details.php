@@ -9,9 +9,13 @@ $author_image_id = get_user_option('metronet_image_id', $author_id);
 $author_image_url = wp_get_attachment_url($author_image_id);
 $author_name = get_the_author_meta('display_name', $author_id);
 $author_url = get_author_posts_url($author_id);
+$is_sold_out = !$product->is_in_stock();
 ?>
 <section id="single-product-details" class="py-5">
 	<div class="container">
+	  <?php if ($is_sold_out) { ?>
+	    <div class="badge fs-1.5x" style="background: red; color: white;">SOLD</div>
+	  <?php } ?>
 		<?php if ($categories) { ?>
 			<p class="product-cat mb-2">
 				<a href="<?= esc_url(get_term_link($categories[0])) ?>" class="text-black"><?= esc_attr($categories[0]->name) ?></a>

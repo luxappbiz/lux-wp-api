@@ -225,6 +225,15 @@ table.pmpro_table {
   border-radius: 0.25rem;
 }
 
+.lux-product-card .badge-sold {
+  position: absolute;
+  top: 0.25rem;
+  right: 1.25rem;
+  display: block;
+  background: red;
+  color: white;
+}
+
 .lux-product-card .product-image {
   width: 100%;
   height: 12rem;

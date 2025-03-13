@@ -12,7 +12,7 @@
         <p class="text-center m-0">You’re trying to access a members-only feature. Upgrade to a membership to unlock this and more!</p>
       </div>
       <div class="modal-footer">
-        <a href="https://luxapp.biz/checkout/?add-to-cart=482" class="btn btn-primary w-100">Buy Membership Now</a>
+        <a href="https://luxapp.biz/checkout/?add-to-cart=482" class="btn btn-black w-100">Buy Membership Now</a>
       </div>
     </div>
   </div>
