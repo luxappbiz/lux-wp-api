@@ -15,7 +15,6 @@ get_header();
       <div class="row justify-content-center">
         <div class="col-auto text-center">
           <?php
-          // Query WooCommerce products
           $args = array(
             'post_type'      => 'product',
             'posts_per_page' => 16,
@@ -34,6 +33,16 @@ get_header();
               <?php } ?>
             </div>
             <?php
+            // Pagination
+            if ($products->max_num_pages > 1) { ?>
+              <div class="lux-pagination" style="margin-top: 1rem; text-align: center;">
+                <?php echo paginate_links(array(
+                  'total'   => $products->max_num_pages,
+                  'current' => max(1, get_query_var('paged')),
+                  'format'  => '?paged=%#%',
+                )); ?>
+              </div>
+            <?php }
             // Reset post data
             wp_reset_postdata();
           } else {
@@ -41,7 +50,7 @@ get_header();
           }
           ?>
         </div>
-      </div> 
+      </div>
     </section>
   <?php } ?>
 </main>
