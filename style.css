@@ -12,6 +12,15 @@ Domain Path: /lang/
 Tags: 
 */
 
+.text-black,
+a.text-black {
+  color: black;
+}
+
+.fs-1\.5x {
+  font-size: 1.5rem;
+}
+
 input[type='submit'].dokan-btn-theme, a.dokan-btn-theme, .dokan-btn-theme {
   background-color: #d70836;
   border-color: #d70836;

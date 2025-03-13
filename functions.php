@@ -87,6 +87,11 @@ function lux_rest_api_cors_headers() {
 }
 
 /*
+ * Membership
+ */
+require_once( $template_directory . '/public/membership.php' );
+
+/*
  * API
  */
 require_once( $template_directory . '/api/helpers.php' );

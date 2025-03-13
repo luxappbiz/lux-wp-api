@@ -20,35 +20,58 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 get_header( 'shop' ); ?>
-<style>
-.woocommerce .woocommerce-breadcrumb {
-	padding-left: 1rem;
-	padding-right: 1rem;
-}
-</style>
+	<style>
+	.woocommerce .woocommerce-breadcrumb {
+		padding-left: 1rem;
+		padding-right: 1rem;
+	}
+	#single-product-details .author-img {
+	  height: 5rem;
+	  width: 5rem;
+		object-fit: cover;
+		border-radius: 0.25rem;
+	}
+	.single-product-seller {
+		padding: 0.25rem;
+		border-radius: 0.25rem;
+		border: 1px solid silver;
+	}
+	</style>
 	<main class="lux-single-product-container">
 		<?php
-			/**
-			 * woocommerce_before_main_content hook.
-			 *
-			 * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs for the content)
-			 * @hooked woocommerce_breadcrumb - 20
-			 */
-			do_action( 'woocommerce_before_main_content' );
+		/**
+		 * woocommerce_before_main_content hook.
+		 *
+		 * @hooked woocommerce_output_content_wrapper - 10 (outputs opening divs for the content)
+		 * @hooked woocommerce_breadcrumb - 20
+		 */
+		do_action( 'woocommerce_before_main_content' );
 		?>
-			<?php while ( have_posts() ) : ?>
-				<?php the_post(); ?>
+	  <?php if (!is_user_logged_in()) { ?>
+	    <?php get_template_part('partials/account', 'login'); ?>
+	  <?php } else {
+	  	$current_user_id = get_current_user_id();
+	  	$membership_subscription_id = lux_get_membership_subscription_id($current_user_id);
+	  	while ( have_posts() ) :
+	  		the_post();
+	  		?>
 				<?php // wc_get_template_part( 'content', 'single-product' ); ?>
 			  <?php get_template_part('partials/product/carousel'); ?>
-			  <?php get_template_part('partials/product/details'); ?>
-			<?php endwhile; // end of the loop. ?>
+			  <?php get_template_part('partials/product/details', null, [
+			  	'membership_subscription_id' => $membership_subscription_id
+			  ]);
+			  if (!$membership_subscription_id) { ?>
+					<?php get_template_part('partials/modal-membership-unlock'); ?>
+				<?php } ?>
+			<?php endwhile;
+		} ?>
 		<?php
-			/**
-			 * woocommerce_after_main_content hook.
-			 *
-			 * @hooked woocommerce_output_content_wrapper_end - 10 (outputs closing divs for the content)
-			 */
-			do_action( 'woocommerce_after_main_content' );
+		/**
+		 * woocommerce_after_main_content hook.
+		 *
+		 * @hooked woocommerce_output_content_wrapper_end - 10 (outputs closing divs for the content)
+		 */
+		do_action( 'woocommerce_after_main_content' );
 		?>
 	</main>
 <?php
