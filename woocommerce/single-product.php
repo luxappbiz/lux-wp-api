@@ -29,26 +29,23 @@ get_header( 'shop' ); ?>
 		 * @hooked woocommerce_breadcrumb - 20
 		 */
 		do_action( 'woocommerce_before_main_content' );
-		?>
-	  <?php if (!is_user_logged_in()) { ?>
-	    <?php get_template_part('partials/account', 'login'); ?>
-	  <?php } else {
+		if (!is_user_logged_in()) {
+	  	get_template_part('partials/account', 'login');
+	  } else {
 	  	$current_user_id = get_current_user_id();
 	  	$membership_subscription_id = lux_get_membership_subscription_id($current_user_id);
+	  	$membership_subscription_id = ($membership_subscription_id['success']) ? $membership_subscription_id['id'] : false;
 	  	while ( have_posts() ) :
 	  		the_post();
-	  		?>
-				<?php // wc_get_template_part( 'content', 'single-product' ); ?>
-			  <?php get_template_part('partials/product/carousel'); ?>
-			  <?php get_template_part('partials/product/details', null, [
+	  		get_template_part('partials/product/carousel');
+	  		get_template_part('partials/product/details', null, [
 			  	'membership_subscription_id' => $membership_subscription_id
 			  ]);
-			  if (!$membership_subscription_id) { ?>
-					<?php get_template_part('partials/modal-membership-unlock'); ?>
-				<?php } ?>
-			<?php endwhile;
-		} ?>
-		<?php
+			  if (!$membership_subscription_id) {
+			  	get_template_part('partials/modal-membership-unlock');
+			  }
+			endwhile;
+		}
 		/**
 		 * woocommerce_after_main_content hook.
 		 *

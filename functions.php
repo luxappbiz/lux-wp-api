@@ -87,9 +87,15 @@ function lux_rest_api_cors_headers() {
 }
 
 /*
- * Membership
+ * Public
  */
+require_once( $template_directory . '/public/woocommerce.php' );
+
+require_once( $template_directory . '/public/shortcodes.php' );
+
 require_once( $template_directory . '/public/membership.php' );
+
+require_once( $template_directory . '/public/sellers.php' );
 
 /*
  * API
@@ -119,12 +125,3 @@ register_nav_menus( array(
   'primary' => __( 'Primary', 'lux' ),
 ) );
 
-/*
- * Public
- */
-require_once( $template_directory . '/public/woocommerce.php' );
-
-/*
- * Shortcodes
- */
-require_once( $template_directory . '/public/shortcodes.php' );

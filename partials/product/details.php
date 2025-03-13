@@ -41,12 +41,12 @@ $author_url = get_author_posts_url($author_id);
 						<?php if ($membership_subscription_id) { ?>
 							<button type="button" class="btn btn-transparent" onclick="alert('To do: navigate to messages')">
 								<img src="<?= get_template_directory_uri() ?>/assets/icons/comments.svg" alt="Comments" style="height: 1.5rem;"/>
-								<span class="sr-only">Message</span>
+								<span class="d-lg-block d-none">Message</span>
 							</button>
 						<?php } else { ?>
 							<button type="button" class="btn btn-transparent" data-toggle="modal" data-target="#membershipUnlockModal">
 								<img src="<?= get_template_directory_uri() ?>/assets/icons/comments.svg" alt="Comments" style="height: 1.5rem;"/>
-								<span class="sr-only">Message</span>
+								<span class="d-lg-block d-none">Message</span>
 							</button>
 						<?php } ?>
 					</div>
