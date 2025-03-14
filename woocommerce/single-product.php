@@ -18,7 +18,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
-
+global $product;
+$author_id = get_post_field('post_author', $product->get_id());
 get_header( 'shop' ); ?>
 	<main class="lux-single-product-container">
 		<?php
@@ -45,6 +46,12 @@ get_header( 'shop' ); ?>
 			  	get_template_part('partials/modal-membership-unlock');
 			  }
 			endwhile;
+			if ($author_id) {
+	  		get_template_part('partials/product/related', null, [
+	  			'product_id' => $product->get_id(),
+	  			'author_id' => $author_id,
+	  		]);				
+			}
 		}
 		/**
 		 * woocommerce_after_main_content hook.

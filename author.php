@@ -65,7 +65,7 @@ $seller_image_url = wp_get_attachment_url($seller_image_id);
           'post_type'      => 'product',
           'posts_per_page' => 16,
           'post_status'    => 'publish',
-          'author'         => $seller->ID, // Filter by this author/seller
+          'author'         => $seller->ID,
           'post__not_in'   => [482],
         );
         $products = new WP_Query($args);

@@ -263,3 +263,11 @@ table.pmpro_table {
   font-size: 0.75rem;
   color: silver;
 }
+
+.lux-pagination .page-numbers {
+  display: inline-block;
+  padding: 0.25em;
+  border: 1px solid silver;
+  border-radius: 0.25rem;
+  min-width: 2rem;
+}
