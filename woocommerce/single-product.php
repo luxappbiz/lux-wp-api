@@ -42,15 +42,12 @@ get_header( 'shop' ); ?>
 	  		get_template_part('partials/product/details', null, [
 			  	'membership_subscription_id' => $membership_subscription_id
 			  ]);
-			  if (!$membership_subscription_id) {
-			  	get_template_part('partials/modal-membership-unlock');
-			  }
 			endwhile;
 			if ($author_id) {
-	  		get_template_part('partials/product/related', null, [
-	  			'product_id' => $product->get_id(),
-	  			'author_id' => $author_id,
-	  		]);				
+				get_template_part('partials/product/related', null, [
+					'product_id' => $product->get_id(),
+					'author_id' => $author_id,
+				]);
 			}
 		}
 		/**

@@ -4,7 +4,6 @@ function lux_verification_status_func() {
   function lux_shortcode_verify_email_verification_code($code) {
     $code = base64_decode($code);
     $code = unserialize($code);
-  
     $users = get_users([
       'meta_key' => 'email_verification_code',
       'meta_value' => $code
@@ -15,7 +14,7 @@ function lux_verification_status_func() {
     }
     return false;
   }
-  ob_start(); // Start output buffering
+  ob_start();
   ?>
   <section id="verifcation-status" class="py-lg-5">
     <div class="row justify-content-center">
@@ -56,5 +55,15 @@ function lux_verification_status_func() {
   $output = ob_get_clean(); // Get the contents of the buffer and clean it
   return $output; // Return the buffered content
 }
-
 add_shortcode('lux_verification_status', 'lux_verification_status_func');
+
+add_shortcode('lux_modal_button_shortcode', function() {
+  ob_start();
+  ?>
+  <button type="button" class="btn btn-black" data-toggle="modal" data-target="#membershipUnlockModal">
+    Start
+  </button>
+  <?php
+  $output = ob_get_clean(); // Get the contents of the buffer and clean it
+  return $output; // Return the buffered content
+});

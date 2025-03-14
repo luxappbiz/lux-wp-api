@@ -23,7 +23,7 @@ add_action('wp_enqueue_scripts', function () {
     'lux-theme-css',
     get_template_directory_uri() . '/style.css',
     array(),
-    '0.1.3',
+    '0.1.5',
     'all'
   );
   // Enqueue jQuery (required for Bootstrap JS, already included in WordPress)

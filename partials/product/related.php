@@ -1,17 +1,22 @@
 
-<section>
-	<div class="container py-5">
-  	<?php
-    $args = array(
-      'post_type'      => 'product',
-      'posts_per_page' => 4,
-      'post_status'    => 'publish',
-      'author'         => $args['author_id'],
-      'post__not_in'   => [$args['product_id'],482],
-    );
-    $products = new WP_Query($args);
-    if ($products->have_posts()) { ?>
-			<div class="row">
+<?php
+$args = array(
+  'post_type'      => 'product',
+  'posts_per_page' => 4,
+  'post_status'    => 'publish',
+  'author'         => $args['author_id'],
+  'post__not_in'   => [$args['product_id'],482],
+);
+$products = new WP_Query($args);
+if ($products->have_posts()) { ?>
+  <section>
+  	<div class="container py-5">
+      <div class="row justify-content-center mb-3">
+        <div class="col-auto text-center">
+          <h3 class="m-0">Related Seller Products</h3>
+        </div>
+      </div>
+			<div class="row" style="row-gap: 1rem;">
         <?php while ($products->have_posts()) {
           $products->the_post();
           ?>
@@ -20,6 +25,6 @@
 	        </div>
 	      <?php } ?>
 			</div>
-    <?php } ?>
-	</div>
-</section>
+  	</div>
+  </section>
+<?php } ?>
