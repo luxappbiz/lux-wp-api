@@ -28,6 +28,16 @@ add_action( 'rest_api_init', function () {
       return is_user_logged_in();
     },
   ));
+
+  register_rest_route('lux/v1', '/user/notification', array(
+    'methods' => 'POST',
+    'callback' => 'lux_api_register_user_notification_token_func',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
+  ));
+
+  
   
   register_rest_route('lux/v1', '/forgot-password', [
     'methods' => 'POST',
@@ -345,4 +355,17 @@ function lux_api_validate_password(WP_REST_Request $request) {
     'success' => true,
     'application_password' => $application_password[0]
   ]);
+}
+
+function lux_api_register_user_notification_token_func(WP_REST_Request $request) {
+  if (!is_user_logged_in()) {
+    return;
+  }
+  $body = $request->get_body();
+  $body = json_decode($body, true);
+  update_user_meta(get_current_user_id(), 'external_id', $body['externalId']);
+  update_user_meta(get_current_user_id(), 'onesignal_id', $body['onesignalId']);
+  return wp_send_json(array(
+    'success' => true,
+  ));  
 }
