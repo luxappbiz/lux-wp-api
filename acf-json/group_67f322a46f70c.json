@@ -171,6 +171,27 @@
             "append": ""
         },
         {
+            "key": "field_68530b55d216e",
+            "label": "Make",
+            "name": "make",
+            "aria-label": "",
+            "type": "text",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "maxlength": "",
+            "allow_in_bindings": 0,
+            "placeholder": "",
+            "prepend": "",
+            "append": ""
+        },
+        {
             "key": "field_67f3233f5dfbf",
             "label": "Stock",
             "name": "stock",
@@ -223,7 +244,7 @@
             {
                 "param": "post_taxonomy",
                 "operator": "==",
-                "value": "product_cat:vehicles"
+                "value": "category:uncategorized"
             }
         ]
     ],
@@ -236,5 +257,5 @@
     "active": true,
     "description": "",
     "show_in_rest": 0,
-    "modified": 1743987538
+    "modified": 1750272868
 }

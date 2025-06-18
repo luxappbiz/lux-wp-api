@@ -43,13 +43,55 @@ add_action('rest_api_init', function () {
           'price' => $product->get_price(),
           'regular_price' => $product->get_regular_price(),
           'sale_price' => $product->get_sale_price(),
-          // 'date_on_sale_from' => $product->get_date_on_sale_from(),
-          // 'date_on_sale_to' => $product->get_date_on_sale_to(),
-          // 'total_sales' => $product->get_total_sales(),
-          // 'gallery_image_ids' => $product->get_gallery_image_ids(),
+          'mileage' => get_post_meta($object['id'], 'mileage', true),
+          'horsepower' => get_post_meta($object['id'], 'power_hp', true),
+          'interiorColor' => get_post_meta($object['id'], 'interior', true),
+          'exteriorColor' => get_post_meta($object['id'], 'exterior', true),
+          'year' => get_post_meta($object['id'], 'year', true),
+          'make' => get_post_meta($object['id'], 'make', true),
+          'model' => get_post_meta($object['id'], 'model', true),
+          'transmissionType' => get_post_meta($object['id'], 'transmission', true),
         ];
       },
-      'update_callback' => null,
+      'update_callback' => function ($value, $object, $field_name, $request) {
+        $product_id = $object->ID;
+
+        if ($request->get_param('mileage') !== null) {
+          update_post_meta($product_id, 'mileage', sanitize_text_field($request->get_param('mileage')));
+          update_post_meta($product_id, 'mileage_km', sanitize_text_field($request->get_param('mileage')));
+        }
+
+        if ($request->get_param('horsepower') !== null) {
+          update_post_meta($product_id, 'power_hp', sanitize_text_field($request->get_param('horsepower')));
+        }
+
+        if ($request->get_param('interiorColor') !== null) {
+          update_post_meta($product_id, 'interior', sanitize_text_field($request->get_param('interiorColor')));
+          update_post_meta($product_id, 'interior_color', sanitize_text_field($request->get_param('interiorColor')));
+        }
+
+        if ($request->get_param('exteriorColor') !== null) {
+          update_post_meta($product_id, 'exterior', sanitize_text_field($request->get_param('exteriorColor')));
+          update_post_meta($product_id, 'exterior_color', sanitize_text_field($request->get_param('exteriorColor')));
+        }
+
+        if ($request->get_param('year') !== null) {
+          update_post_meta($product_id, 'year', sanitize_text_field($request->get_param('year')));
+        }
+
+        if ($request->get_param('make') !== null) {
+          update_post_meta($product_id, 'make', sanitize_text_field($request->get_param('make')));
+        }
+
+        if ($request->get_param('model') !== null) {
+          update_post_meta($product_id, 'model', sanitize_text_field($request->get_param('model')));
+        }
+
+        if ($request->get_param('transmissionType') !== null) {
+          update_post_meta($product_id, 'transmission', sanitize_text_field($request->get_param('transmissionType')));
+          update_post_meta($product_id, 'gearbox', sanitize_text_field($request->get_param('transmissionType')));
+        }
+      },
       'schema' => null,
     )
   );
@@ -301,6 +343,42 @@ function lux_create_product_with_image(WP_REST_Request $request)
     return new WP_Error('product_creation_failed', 'Failed to create product', ['status' => 500]);
   }
 
+  if ($request->get_param('mileage') !== null) {
+    update_post_meta($product_id, 'mileage', sanitize_text_field($request->get_param('mileage')));
+    update_post_meta($product_id, 'mileage_km', sanitize_text_field($request->get_param('mileage')));
+  }
+
+  if ($request->get_param('horsepower') !== null) {
+    update_post_meta($product_id, 'power_hp', sanitize_text_field($request->get_param('horsepower')));
+  }
+
+  if ($request->get_param('interiorColor') !== null) {
+    update_post_meta($product_id, 'interior', sanitize_text_field($request->get_param('interiorColor')));
+    update_post_meta($product_id, 'interior_color', sanitize_text_field($request->get_param('interiorColor')));
+  }
+
+  if ($request->get_param('exteriorColor') !== null) {
+    update_post_meta($product_id, 'exterior', sanitize_text_field($request->get_param('exteriorColor')));
+    update_post_meta($product_id, 'exterior_color', sanitize_text_field($request->get_param('exteriorColor')));
+  }
+
+  if ($request->get_param('year') !== null) {
+    update_post_meta($product_id, 'year', sanitize_text_field($request->get_param('year')));
+  }
+
+  if ($request->get_param('make') !== null) {
+    update_post_meta($product_id, 'make', sanitize_text_field($request->get_param('make')));
+  }
+
+  if ($request->get_param('model') !== null) {
+    update_post_meta($product_id, 'model', sanitize_text_field($request->get_param('model')));
+  }
+
+  if ($request->get_param('transmissionType') !== null) {
+    update_post_meta($product_id, 'transmission', sanitize_text_field($request->get_param('transmissionType')));
+    update_post_meta($product_id, 'gearbox', sanitize_text_field($request->get_param('transmissionType')));
+  }
+
   // Update post author
   wp_update_post([
     'ID' => $product_id,
@@ -409,6 +487,43 @@ if (!empty($gallery_images)) {
   if (!$product_id) {
     return new WP_Error('product_creation_failed', 'Failed to create product', array('status' => 500));
   }
+
+  if ($request->get_param('mileage') !== null) {
+    update_post_meta($product_id, 'mileage', sanitize_text_field($request->get_param('mileage')));
+    update_post_meta($product_id, 'mileage_km', sanitize_text_field($request->get_param('mileage')));
+  }
+
+  if ($request->get_param('horsepower') !== null) {
+    update_post_meta($product_id, 'power_hp', sanitize_text_field($request->get_param('horsepower')));
+  }
+
+  if ($request->get_param('interiorColor') !== null) {
+    update_post_meta($product_id, 'interior', sanitize_text_field($request->get_param('interiorColor')));
+    update_post_meta($product_id, 'interior_color', sanitize_text_field($request->get_param('interiorColor')));
+  }
+
+  if ($request->get_param('exteriorColor') !== null) {
+    update_post_meta($product_id, 'exterior', sanitize_text_field($request->get_param('exteriorColor')));
+    update_post_meta($product_id, 'exterior_color', sanitize_text_field($request->get_param('exteriorColor')));
+  }
+
+  if ($request->get_param('year') !== null) {
+    update_post_meta($product_id, 'year', sanitize_text_field($request->get_param('year')));
+  }
+
+  if ($request->get_param('make') !== null) {
+    update_post_meta($product_id, 'make', sanitize_text_field($request->get_param('make')));
+  }
+
+  if ($request->get_param('model') !== null) {
+    update_post_meta($product_id, 'model', sanitize_text_field($request->get_param('model')));
+  }
+
+  if ($request->get_param('transmissionType') !== null) {
+    update_post_meta($product_id, 'transmission', sanitize_text_field($request->get_param('transmissionType')));
+    update_post_meta($product_id, 'gearbox', sanitize_text_field($request->get_param('transmissionType')));
+  }
+
   // Return product info
   return new WP_REST_Response([
     'id'       => $product_id,
