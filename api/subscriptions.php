@@ -186,10 +186,8 @@ function lux_get_user_membership(WP_REST_Request $request) {
       array('status' => 400)
     );
   }
-
   $user_id = (int) $request['user_id'];
   $user = get_user_by('id', $user_id);
-
   if (!$user) {
     return new WP_Error(
       'user_not_found',
@@ -197,7 +195,6 @@ function lux_get_user_membership(WP_REST_Request $request) {
       array('status' => 404)
     );
   }
-
   $subscriptions = wcs_get_users_subscriptions($user_id);
   foreach ($subscriptions as $subscription) {
     foreach ($subscription->get_items() as $item) {
@@ -222,7 +219,6 @@ function lux_get_user_membership(WP_REST_Request $request) {
       }
     }
   }
-
   return new WP_REST_Response(array(
     'membership' => null,
     'message' => __('No membership subscription found for this user.', 'lux-subscriptions-api'),

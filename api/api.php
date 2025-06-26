@@ -18,3 +18,5 @@ require_once( $template_directory . '/api/favorites.php' );
 require_once( $template_directory . '/api/messages.php' );
 
 require_once( $template_directory . '/api/sellers.php' );
+
+require_once( $template_directory . '/api/subscriptions.php' );
