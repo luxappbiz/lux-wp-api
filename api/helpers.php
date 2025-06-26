@@ -26,3 +26,21 @@ function lux_api_helper_get_total_unread_messages_count($user_id = false) {
   }
   return $total_unread_messages_count;
 }
+
+function lux_user_has_active_membership($user_id) {
+  if (!class_exists('WC_Subscriptions') || !function_exists('wcs_get_users_subscriptions')) {
+    return false;
+  }
+  $subscriptions = wcs_get_users_subscriptions($user_id);
+  foreach ($subscriptions as $subscription) {
+    if (!in_array($subscription->get_status(), array('active', 'trial'))) {
+      continue;
+    }
+    foreach ($subscription->get_items() as $item) {
+      if ((int) $item->get_product_id() === 482) {
+        return true;
+      }
+    }
+  }
+  return false;
+}

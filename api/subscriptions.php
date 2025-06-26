@@ -225,12 +225,6 @@ function lux_get_user_membership(WP_REST_Request $request) {
   ), 200);
 }
 
-/**
- * Permission callback to restrict access to the endpoint.
- *
- * @param WP_REST_Request $request The REST API request object.
- * @return bool|WP_Error True if permitted, WP_Error if not.
- */
 function lux_subscriptions_permissions_check(WP_REST_Request $request) {
   $user_id = (int) $request['user_id'];
   $current_user_id = get_current_user_id();
