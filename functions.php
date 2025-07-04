@@ -99,6 +99,8 @@ require_once( $template_directory . '/public/sellers.php' );
 
 require_once( $template_directory . '/api/api.php' );
 
+require_once( $template_directory . '/api/onesignal_notifications.php' );
+
 /**
  * Theme nav menus
  */
