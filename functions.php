@@ -71,6 +71,7 @@ require_once( $template_directory . '/admin/admin.php' );
 
 require_once( $template_directory . '/admin/messages.php' );
 
+require_once( $template_directory . '/api/onesignal_notifications.php' );
 require_once( $template_directory . '/admin/push-notifications.php' );
 
 function lux_rest_api_cors_headers() {

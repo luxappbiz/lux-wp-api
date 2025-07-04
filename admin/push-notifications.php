@@ -12,29 +12,9 @@ add_action('admin_menu', function () {
     30                                     // Menu position
   );
 });
+  // Render the admin page
+  function lux_render_push_notifications_page() {
 
-// Render the admin page
-function lux_render_push_notifications_page() {
-  // Check if form is submitted
-  if (isset($_POST['lux_push_submit']) && check_admin_referer('lux_push_notification_nonce', 'lux_nonce')) {
-    $title = sanitize_text_field($_POST['lux_push_title']);
-    $body = sanitize_text_field($_POST['lux_push_body']);
-    $push_token = sanitize_text_field($_POST['lux_push_token']);
-    // Validate push token format (basic check)
-    if (empty($push_token) || strpos($push_token, 'ExponentPushToken[') !== 0) {
-      echo '<div class="notice notice-error is-dismissible"><p>Please enter a valid ExponentPushToken (e.g., ExponentPushToken[xxx]).</p></div>';
-    } else {
-      // Send the push notification
-      $response = lux_send_push_notification($title, $body, $push_token);
-      // Display success or error message
-      if (!is_wp_error($response)) {
-        $response_body = wp_remote_retrieve_body($response);
-        echo '<div class="notice notice-success is-dismissible"><p>Push notification sent successfully! Response: ' . esc_html($response_body) . '</p></div>';
-      } else {
-        echo '<div class="notice notice-error is-dismissible"><p>Error sending push notification: ' . esc_html($response->get_error_message()) . '</p></div>';
-      }
-    }
-  }
   ?>
   <div class="wrap">
     <h1>Mobile App Push Notifications</h1>
@@ -44,17 +24,17 @@ function lux_render_push_notifications_page() {
       <table class="form-table">
         <tr>
           <th scope="row"><label for="lux_push_title">Title</label></th>
-          <td><input type="text" name="lux_push_title" id="lux_push_title" class="regular-text" required /></td>
+          <td><input type="text" name="lux_push_title" id="lux_push_title" class="regular-text" value="<?= $_POST['lux_push_title'] ?>" required /></td>
         </tr>
         <tr>
           <th scope="row"><label for="lux_push_body">Body</label></th>
-          <td><input type="text" name="lux_push_body" id="lux_push_body" class="regular-text" required /></td>
+          <td><input type="text" name="lux_push_body" id="lux_push_body" class="regular-text" value="<?= $_POST['lux_push_body'] ?>" required /></td>
         </tr>
         <tr>
-          <th scope="row"><label for="lux_push_token">Push Token</label></th>
+          <th scope="row"><label for="lux_push_user_id">User Id</label></th>
           <td>
-            <input type="text" name="lux_push_token" id="lux_push_token" class="regular-text" required placeholder="ExponentPushToken[xxxxxxxxxxxxxxxxxxxxxx]" />
-            <p class="description">Enter the Expo push token for the recipient device.</p>
+            <input type="number" name="lux_push_user_id" id="lux_push_user_id" class="regular-text" value="<?= $_POST['lux_push_user_id'] ?>" required />
+            <p class="description">Enter the User Id.</p>
           </td>
         </tr>
       </table>
@@ -62,23 +42,33 @@ function lux_render_push_notifications_page() {
     </form>
   </div>
   <?php
-}
-
-// Function to send the push notification via Expo API
-function lux_send_push_notification($title, $body, $push_token) {
-  $api_url = 'https://exp.host/--/api/v2/push/send';
-  $request_body = wp_json_encode(array(
-    'to'    => $push_token,
-    'title' => $title,
-    'body'  => $body,
-  ));
-  $args = array(
-    'method'      => 'POST',
-    'headers'     => array(
-      'Content-Type' => 'application/json',
-    ),
-    'body'        => $request_body,
-    'timeout'     => 30,
-  );
-  return wp_remote_post($api_url, $args);
+  // Check if form is submitted
+  if (isset($_POST['lux_push_submit']) && check_admin_referer('lux_push_notification_nonce', 'lux_nonce')) {
+    $title = sanitize_text_field($_POST['lux_push_title']);
+    $body = sanitize_text_field($_POST['lux_push_body']);
+    $lux_push_user_id = sanitize_text_field($_POST['lux_push_user_id']);
+    if (!$lux_push_user_id) {
+      echo '<div class="notice notice-error is-dismissible"><p>Please enter USER ID</p></div>';
+      return;
+    }
+    $lux_push_user_id = get_user_by('id', $lux_push_user_id);
+    if (!$lux_push_user_id) {
+      echo '<div class="notice notice-error is-dismissible"><p>Unable to find User</p></div>';
+      return;
+    }
+    $push_token = get_user_meta($lux_push_user_id, 'onesignal_id', true);
+    if (!$push_token) {
+      echo '<div class="notice notice-error is-dismissible"><p>User does not have registered onesignal id.</p></div>';
+      return;
+    }
+    // Send the push notification
+    $response = send_new_message_notification([$push_token], $body, $title);
+    // Optional: handle response
+    if (is_wp_error($response)) {
+      echo $response->get_error_message();
+    } else {
+      $body = wp_remote_retrieve_body($response);
+      print_r($body);
+    }
+  }
 }
