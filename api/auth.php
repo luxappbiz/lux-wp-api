@@ -428,10 +428,16 @@ function lux_validate_vires_api_key(WP_REST_Request $request, $required_capabili
 {
   global $wpdb;
 
-  $api_key = $request->get_header('api-key') ?: $request->get_param('api_key');
+
+  $authorization_header = $request->get_header('authorization');
+  $api_key = null;
+
+  if ($authorization_header && preg_match('/^Bearer\s+(.+)$/i', $authorization_header, $matches)) {
+    $api_key = trim($matches[1]);
+  }
 
   if (!$api_key) {
-    return new WP_Error('missing_api_key', 'API key is required', array('status' => 401));
+    return new WP_Error('missing_api_key', 'API key is required in Authorization header as "Bearer <token>"', array('status' => 401));
   }
 
   $api_keys_table = $wpdb->prefix . 'vires_api_keys';
@@ -480,5 +486,4 @@ function lux_validate_vires_api_key(WP_REST_Request $request, $required_capabili
 
   return true;
 }
-
 
