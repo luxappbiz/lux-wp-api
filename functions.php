@@ -71,7 +71,6 @@ require_once( $template_directory . '/admin/admin.php' );
 
 require_once( $template_directory . '/admin/messages.php' );
 
-require_once( $template_directory . '/api/onesignal_notifications.php' );
 require_once( $template_directory . '/admin/push-notifications.php' );
 
 function lux_rest_api_cors_headers() {
@@ -99,6 +98,8 @@ require_once( $template_directory . '/public/membership.php' );
 require_once( $template_directory . '/public/sellers.php' );
 
 require_once( $template_directory . '/api/api.php' );
+
+require_once( $template_directory . '/api/onesignal_notifications.php' );
 
 /**
  * Theme nav menus
