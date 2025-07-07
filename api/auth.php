@@ -1,6 +1,6 @@
 <?php
 
-add_action( 'rest_api_init', function () {
+add_action('rest_api_init', function () {
   register_rest_route('lux/v1', '/register', array(
     'methods' => 'POST',
     'callback' => 'lux_api_register',
@@ -16,7 +16,7 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/user', array(
     'methods' => 'GET',
     'callback' => 'lux_mobile_app_get_user_func',
-    'permission_callback' => function($request) {
+    'permission_callback' => function ($request) {
       return is_user_logged_in();
     },
   ));
@@ -24,7 +24,7 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/user', array(
     'methods' => 'POST',
     'callback' => 'lux_mobile_app_update_user_func',
-    'permission_callback' => function($request) {
+    'permission_callback' => function ($request) {
       return is_user_logged_in();
     },
   ));
@@ -32,13 +32,13 @@ add_action( 'rest_api_init', function () {
   register_rest_route('lux/v1', '/user/notification', array(
     'methods' => 'POST',
     'callback' => 'lux_api_register_user_notification_token_func',
-    'permission_callback' => function($request) {
+    'permission_callback' => function ($request) {
       return is_user_logged_in();
     },
   ));
 
-  
-  
+
+
   register_rest_route('lux/v1', '/forgot-password', [
     'methods' => 'POST',
     'callback' => 'lux_api_handle_forgot_password',
@@ -50,9 +50,24 @@ add_action( 'rest_api_init', function () {
     'callback' => 'lux_api_validate_password',
     'permission_callback' => '__return_true',
   ]);
+
+
+  register_rest_route('lux/v2', '/register', array(
+    'methods' => 'POST',
+    'callback' => 'lux_api_register_v2',
+    'permission_callback' => '__return_true',
+  ));
+
+  register_rest_route('lux/v2', '/login', array(
+    'methods' => 'POST',
+    'callback' => 'lux_api_login_v2',
+    'permission_callback' => '__return_true',
+  ));
+
 });
 
-function lux_api_register(WP_REST_Request $request) {
+function lux_api_register(WP_REST_Request $request)
+{
   lux_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
@@ -97,7 +112,8 @@ function lux_api_register(WP_REST_Request $request) {
   ]);
 }
 
-function lux_create_unique_username_by_email($email) {
+function lux_create_unique_username_by_email($email)
+{
   $username = '';
   // If @ is found and it's not the last character, return substring before @
   $atPosition = strpos($email, '@');
@@ -106,14 +122,15 @@ function lux_create_unique_username_by_email($email) {
   }
   $username = strtolower($username);
   $i = 2;
-  while (username_exists( $username )) {
+  while (username_exists($username)) {
     $username = $username . $i;
     $i++;
   }
   return $username;
 }
 
-function lux_createRandStr($strLength) {
+function lux_createRandStr($strLength)
+{
   //specify characters to be used in generating random string, do not specify any characters that wordpress does not allow in the creation.
   $characters = "0123456789ABCDEFGHIJKLMNPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_[]{}!@$%^*().,>=-;|:?";
   //get the total length of specified characters to be used in generating random string
@@ -125,11 +142,12 @@ function lux_createRandStr($strLength) {
     $randomCharacter = $characters[rand(0, $charactersLength - 1)];
     //add the random characters to the random string
     $randomString .= $randomCharacter;
-  };
+  }
+  ;
   //sanitize_user, just in case 
   $sanRandomString = sanitize_user($randomString);
   //check that random string contains Uppercase/Lowercase/Intergers/Special Char and that it is the correct length
-  if ( (preg_match('([a-zA-Z].*[0-9]|[0-9].*[a-zA-Z].*[_\W])', $sanRandomString)==1) && (strlen($sanRandomString)==$strLength) ) {
+  if ((preg_match('([a-zA-Z].*[0-9]|[0-9].*[a-zA-Z].*[_\W])', $sanRandomString) == 1) && (strlen($sanRandomString) == $strLength)) {
     //return the random string if it meets the complexity criteria 
     return $sanRandomString;
   } else {
@@ -138,7 +156,8 @@ function lux_createRandStr($strLength) {
   }
 }
 
-function lux_api_send_verification_email($user_id) {
+function lux_api_send_verification_email($user_id)
+{
   if (!$user_id) {
     $user_id = get_current_user_id();
   }
@@ -148,7 +167,7 @@ function lux_api_send_verification_email($user_id) {
   update_user_meta($user_id, 'email_verified', false);
   update_user_meta($user_id, 'email_verification_code', $code);
   update_user_meta($user_id, 'email_verification_code_generation_time', time());
-  $email_code_verification_page_link  = get_field('email_code_verification_page_link', 'option');
+  $email_code_verification_page_link = get_field('email_code_verification_page_link', 'option');
   $url = $email_code_verification_page_link . '?code=' . base64_encode(serialize($code));
   $body = get_field('verification_email_template', 'option');
   $tags_to_replace = [
@@ -163,7 +182,8 @@ function lux_api_send_verification_email($user_id) {
   return wp_mail($user_data->user_email, 'LUX Email Verification', $body, $headers);
 }
 
-function lux_api_login(WP_REST_Request $request) {
+function lux_api_login(WP_REST_Request $request)
+{
   lux_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
@@ -196,7 +216,8 @@ function lux_api_login(WP_REST_Request $request) {
   ]);
 }
 
-function lux_generate_random_string($length = 10) {
+function lux_generate_random_string($length = 10)
+{
   $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   $charactersLength = strlen($characters);
   $randomString = '';
@@ -206,11 +227,12 @@ function lux_generate_random_string($length = 10) {
   return $randomString;
 }
 
-function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
+function lux_mobile_app_get_user_func(WP_REST_Request $request)
+{
   $authorization = $request->get_header_as_array('authorization');
   if (!$authorization) {
     wp_send_json([
-      'success'=>false,
+      'success' => false,
       'error' => 'Invalid auth code',
     ]);
   }
@@ -220,22 +242,23 @@ function lux_mobile_app_get_user_func( WP_REST_Request $request ) {
   ));
   if (!$user) {
     wp_send_json([
-      'success'=>false,
+      'success' => false,
       'error' => 'Invalid auth code',
     ]);
   }
   wp_send_json([
-    'success'=>true,
+    'success' => true,
     'user' => $user[0]->data
   ]);
 }
 
-function lux_mobile_app_update_user_func(WP_REST_Request $request) {
+function lux_mobile_app_update_user_func(WP_REST_Request $request)
+{
   lux_rest_api_cors_headers();
   $user_id = get_current_user_id();
   $new_display_name = sanitize_text_field($request->get_param('display_name'));
   $media_id = null;
-  if (! $user_id) {
+  if (!$user_id) {
     return new WP_Error('mpp_no_user', __('User not found.', ''), array('status' => 403));
   }
   // if (! current_user_can('upload_files', $user_id)) {
@@ -262,41 +285,43 @@ function lux_mobile_app_update_user_func(WP_REST_Request $request) {
   $result = wp_update_user($user_data);
   if (is_wp_error($result)) {
     wp_send_json([
-      'success'=>false,
-      'error'=>$result
+      'success' => false,
+      'error' => $result
     ]);
   }
   wp_send_json([
-    'success'=>true,
+    'success' => true,
   ]);
 }
 
- function lux_get_media_post_id( $user_id = 0 ) {
-  $user = get_user_by( 'id', $user_id );
+function lux_get_media_post_id($user_id = 0)
+{
+  $user = get_user_by('id', $user_id);
   // Get/Create Profile Picture Post.
   $post_args = array(
-    'post_type'   => 'mt_pp',
-    'author'      => $user_id,
+    'post_type' => 'mt_pp',
+    'author' => $user_id,
     'post_status' => 'publish',
   );
-  $posts = get_posts( $post_args );
-  if ( ! $posts ) {
+  $posts = get_posts($post_args);
+  if (!$posts) {
     $post_id = wp_insert_post(
       array(
         'post_author' => $user_id,
-        'post_type'   => 'mt_pp',
+        'post_type' => 'mt_pp',
         'post_status' => 'publish',
-        'post_title'  => $user->data->display_name,
+        'post_title' => $user->data->display_name,
       )
     );
   } else {
-    $post    = end( $posts );
+    $post = end($posts);
     $post_id = $post->ID;
   }
   return $post_id;
 }
 
-function lux_api_handle_forgot_password(WP_REST_Request $request) {
+function lux_api_handle_forgot_password(WP_REST_Request $request)
+{
   lux_rest_api_cors_headers();
   $email = sanitize_email($request->get_param('email'));
   if (!is_email($email)) {
@@ -338,7 +363,8 @@ function lux_api_handle_forgot_password(WP_REST_Request $request) {
   ]);
 }
 
-function lux_api_validate_password(WP_REST_Request $request) {
+function lux_api_validate_password(WP_REST_Request $request)
+{
   $body = $request->get_body();
   $body = json_decode($body, true);
   $user_id = $body['id'];
@@ -358,7 +384,8 @@ function lux_api_validate_password(WP_REST_Request $request) {
   ]);
 }
 
-function lux_api_register_user_notification_token_func(WP_REST_Request $request) {
+function lux_api_register_user_notification_token_func(WP_REST_Request $request)
+{
   if (!is_user_logged_in()) {
     return;
   }
@@ -368,5 +395,31 @@ function lux_api_register_user_notification_token_func(WP_REST_Request $request)
   update_user_meta(get_current_user_id(), 'onesignal_id', $body['onesignalId']);
   return wp_send_json(array(
     'success' => true,
-  ));  
+  ));
 }
+
+function lux_api_register_v2(WP_REST_Request $request)
+{
+
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+
+  if (is_wp_error($api_validation)) {
+    return $api_validation;
+  }
+
+  return lux_api_register($request);
+}
+
+function lux_api_login_v2(WP_REST_Request $request)
+{
+
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+
+  if (is_wp_error($api_validation)) {
+    return $api_validation;
+  }
+
+  return lux_api_login($request);
+}
+
+
