@@ -398,7 +398,7 @@ function lux_api_register_user_notification_token_func(WP_REST_Request $request)
   ));
 }
 
-function lux_api_register_v2_simple(WP_REST_Request $request)
+function lux_api_register_v2(WP_REST_Request $request)
 {
 
   $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
@@ -410,7 +410,7 @@ function lux_api_register_v2_simple(WP_REST_Request $request)
   return lux_api_register($request);
 }
 
-function lux_api_login_v2_simple(WP_REST_Request $request)
+function lux_api_login_v2(WP_REST_Request $request)
 {
 
   $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
