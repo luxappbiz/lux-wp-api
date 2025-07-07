@@ -398,92 +398,28 @@ function lux_api_register_user_notification_token_func(WP_REST_Request $request)
   ));
 }
 
-
-function lux_api_register_v2(WP_REST_Request $request)
+function lux_api_register_v2_simple(WP_REST_Request $request)
 {
 
-  $api_validation = lux_validate_vires_api_key($request, 'can_register_users');
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+
   if (is_wp_error($api_validation)) {
     return $api_validation;
   }
-
 
   return lux_api_register($request);
 }
 
-function lux_api_login_v2(WP_REST_Request $request)
+function lux_api_login_v2_simple(WP_REST_Request $request)
 {
 
-  $api_validation = lux_validate_vires_api_key($request, 'can_login_users');
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+
   if (is_wp_error($api_validation)) {
     return $api_validation;
   }
 
-
   return lux_api_login($request);
 }
 
-
-function lux_validate_vires_api_key(WP_REST_Request $request, $required_capability)
-{
-  global $wpdb;
-
-
-  $authorization_header = $request->get_header('authorization');
-  $api_key = null;
-
-  if ($authorization_header && preg_match('/^Bearer\s+(.+)$/i', $authorization_header, $matches)) {
-    $api_key = trim($matches[1]);
-  }
-
-  if (!$api_key) {
-    return new WP_Error('missing_api_key', 'API key is required in Authorization header as "Bearer <token>"', array('status' => 401));
-  }
-
-  $api_keys_table = $wpdb->prefix . 'vires_api_keys';
-  $api_meta_table = $wpdb->prefix . 'vires_api_key_meta';
-
-  $key_data = $wpdb->get_row(
-    $wpdb->prepare(
-      "SELECT * FROM {$api_keys_table} WHERE api_key = %s AND active = 1",
-      $api_key
-    ),
-    ARRAY_A
-  );
-
-  if (!$key_data) {
-    return new WP_Error('invalid_api_key', 'Invalid or inactive API key', array('status' => 401));
-  }
-
-  if ($key_data['credit_balance'] <= 0) {
-    return new WP_Error('insufficient_credits', 'API key has no remaining credits', array('status' => 402));
-  }
-
-  $capabilities_json = $wpdb->get_var(
-    $wpdb->prepare(
-      "SELECT meta_value FROM {$api_meta_table} 
-             WHERE key_id = %d AND meta_name = 'capabilities'",
-      $key_data['id']
-    )
-  );
-
-  if ($capabilities_json) {
-    $capabilities = json_decode($capabilities_json, true);
-    if (!isset($capabilities[$required_capability]) || !$capabilities[$required_capability]) {
-      return new WP_Error('insufficient_permissions', 'API key does not have permission for this operation', array('status' => 403));
-    }
-  }
-
-  $wpdb->query(
-    $wpdb->prepare(
-      "UPDATE {$api_keys_table} 
-             SET last_used_at = %s, usage_count = usage_count + 1, credit_balance = credit_balance - 1 
-             WHERE id = %d",
-      current_time('mysql'),
-      $key_data['id']
-    )
-  );
-
-  return true;
-}
 
