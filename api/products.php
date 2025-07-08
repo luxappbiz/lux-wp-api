@@ -194,7 +194,7 @@ add_action('rest_api_init', function () {
       array(
         'get_callback' => function ($object) {
           $vendor = dokan_get_vendor_by_product($object['id']);
-          if (!$vendor) {
+          if (! $vendor) {
             return false; // Vendor not found
           }
           return $vendor->get_id();
@@ -206,45 +206,22 @@ add_action('rest_api_init', function () {
   }
 
   register_rest_route('lux/v1', '/create-product', array(
-    'methods' => 'POST',
+    'methods'  => 'POST',
     'callback' => 'lux_create_product_with_image',
     'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/update-product', array(
-    'methods' => 'POST',
+    'methods'  => 'POST',
     'callback' => 'lux_update_product_with_image',
     'permission_callback' => '__return_true',
   ));
 
   register_rest_route('lux/v1', '/report-product', array(
-    'methods' => 'POST',
+    'methods'  => 'POST',
     'callback' => 'lux_report_product',
     'permission_callback' => '__return_true',
   ));
-
-
-  // V2 Create Product Route
-  register_rest_route('lux/v2', '/create-product', array(
-    'methods' => 'POST',
-    'callback' => 'lux_create_product_with_image_v2',
-    'permission_callback' => '__return_true',
-  ));
-
-  // V2 Update Product Route  
-  register_rest_route('lux/v2', '/update-product', array(
-    'methods' => 'POST',
-    'callback' => 'lux_update_product_with_image_v2',
-    'permission_callback' => '__return_true',
-  ));
-
-  // V2 Report Product Route
-  register_rest_route('lux/v2', '/report-product', array(
-    'methods' => 'POST',
-    'callback' => 'lux_report_product_v2',
-    'permission_callback' => '__return_true',
-  ));
-
 });
 
 add_filter('rest_prepare_product', function ($response, $post, $request) {
@@ -298,7 +275,7 @@ function lux_create_product_with_image(WP_REST_Request $request)
   // Get parameters
   $title = sanitize_text_field($request->get_param('title'));
   $price = sanitize_text_field($request->get_param('regular_price'));
-  $category_id = (int) $request->get_param('category_id') ?: 1;
+  $category_id = (int)$request->get_param('category_id') ?: 1;
   $fileParams = $request->get_file_params();
 
   $image = $fileParams['thumbnail'];
@@ -322,7 +299,7 @@ function lux_create_product_with_image(WP_REST_Request $request)
   $attachment_id = lux_create_attachment($upload['file'], $upload['url']);
   if ($attachment_id) {
     $product->set_image_id($attachment_id);
-  }
+  } 
 
   // Handle gallery images
   $galleryImageIds = [];
@@ -331,21 +308,21 @@ function lux_create_product_with_image(WP_REST_Request $request)
   if (!empty($gallery_images)) {
     $galleryImageIds = [];
     $galleryImageIdsError = [];
-
+  
     // Iterate over the files
     foreach ($gallery_images['name'] as $index => $name) {
       // Create a single file array for wp_handle_upload
       $file = [
-        'name' => $gallery_images['name'][$index],
-        'type' => $gallery_images['type'][$index],
+        'name'     => $gallery_images['name'][$index],
+        'type'     => $gallery_images['type'][$index],
         'tmp_name' => $gallery_images['tmp_name'][$index],
-        'error' => $gallery_images['error'][$index],
-        'size' => $gallery_images['size'][$index],
+        'error'    => $gallery_images['error'][$index],
+        'size'     => $gallery_images['size'][$index],
       ];
-
+  
       // Process each file
       $upload_gallery = wp_handle_upload($file, ['test_form' => false]);
-
+  
       if (!isset($upload_gallery['error'])) {
         $gallery_attachment_id = lux_create_attachment($upload_gallery['file'], $upload_gallery['url']);
         if ($gallery_attachment_id) {
@@ -410,34 +387,13 @@ function lux_create_product_with_image(WP_REST_Request $request)
 
   // Return product info
   return new WP_REST_Response([
-    'id' => $product_id,
-    'title' => $title,
-    'price' => $price,
-    'image_id' => $attachment_id,
-    'gallery_image_ids' => $galleryImageIds,
-    'gallery_errors' => json_encode($galleryImageIdsError),
+    'id'                 => $product_id,
+    'title'              => $title,
+    'price'              => $price,
+    'image_id'           => $attachment_id,
+    'gallery_image_ids'  => $galleryImageIds,
+    'gallery_errors'     => json_encode($galleryImageIdsError),
   ], 200);
-}
-function lux_create_product_with_image_v2(WP_REST_Request $request)
-{
-  // Check if Vires API function exists
-  if (!function_exists('vires_validate_api_key')) {
-    return new WP_Error(
-      'vires_not_available',
-      'Vires API Keys plugin not active',
-      array('status' => 500)
-    );
-  }
-
-  // Validate API key (header only)
-  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
-
-  if (is_wp_error($api_validation)) {
-    return $api_validation;
-  }
-
-
-  return lux_create_product_with_image($request);
 }
 
 function lux_update_product_with_image(WP_REST_Request $request)
@@ -450,8 +406,8 @@ function lux_update_product_with_image(WP_REST_Request $request)
   $product_id = sanitize_text_field($request->get_param('id'));
   $title = sanitize_text_field($request->get_param('title'));
   $price = sanitize_text_field($request->get_param('regular_price'));
-  $category_id = (int) (sanitize_text_field($request->get_param('category_id')) ?: 1);
-
+  $category_id = (int)(sanitize_text_field($request->get_param('category_id')) ?: 1);
+  
   // $image = $request->get_file_params()['thumbnail'];
 
   // if (!$title || !$price || !$image) {
@@ -474,7 +430,7 @@ function lux_update_product_with_image(WP_REST_Request $request)
     if (isset($upload['error'])) {
       return new WP_Error('image_upload_failed', $upload['error'], ['status' => 500]);
     }
-
+  
     $attachment_id = lux_create_attachment($upload['file'], $upload['url'], $product_id);
     if (!$attachment_id) {
       return new WP_Error('attachment_creation_failed', 'Failed to create attachment', ['status' => 500]);
@@ -485,33 +441,33 @@ function lux_update_product_with_image(WP_REST_Request $request)
   }
 
 
-  // Handle gallery images
-  $galleryImageIds = $product->get_gallery_image_ids();
+// Handle gallery images
+$galleryImageIds = $product->get_gallery_image_ids();
 
-  foreach ($request->get_param('deleted_gallery_image_ids') as $deleted_gallery_image_id) {
-    if (($key = array_search($deleted_gallery_image_id, $galleryImageIds)) !== false) {
-      wp_delete_attachment($deleted_gallery_image_id);
-      unset($galleryImageIds[$key]);
-    }
+foreach ($request->get_param('deleted_gallery_image_ids') as $deleted_gallery_image_id) {
+  if (($key = array_search($deleted_gallery_image_id, $galleryImageIds)) !== false) {
+    wp_delete_attachment($deleted_gallery_image_id);
+    unset($galleryImageIds[$key]);
   }
+}
 
-  $galleryImageIdsError = [];
+$galleryImageIdsError = [];
 
-  $gallery_images = isset($fileParams['gallery_images']) ? $fileParams['gallery_images'] : [];
-  if (!empty($gallery_images)) {
-    // Iterate over the files
-    foreach ($gallery_images['name'] as $index => $name) {
-      // Create a single file array for wp_handle_upload
-      $file = [
-        'name' => $gallery_images['name'][$index],
-        'type' => $gallery_images['type'][$index],
-        'tmp_name' => $gallery_images['tmp_name'][$index],
-        'error' => $gallery_images['error'][$index],
-        'size' => $gallery_images['size'][$index],
-      ];
+$gallery_images = isset($fileParams['gallery_images']) ? $fileParams['gallery_images'] : [];
+if (!empty($gallery_images)) {
+  // Iterate over the files
+  foreach ($gallery_images['name'] as $index => $name) {
+    // Create a single file array for wp_handle_upload
+    $file = [
+      'name'     => $gallery_images['name'][$index],
+      'type'     => $gallery_images['type'][$index],
+      'tmp_name' => $gallery_images['tmp_name'][$index],
+      'error'    => $gallery_images['error'][$index],
+      'size'     => $gallery_images['size'][$index],
+    ];
 
-      // Process each file
-      $upload_gallery = wp_handle_upload($file, ['test_form' => false]);
+    // Process each file
+    $upload_gallery = wp_handle_upload($file, ['test_form' => false]);
 
       if (!isset($upload_gallery['error'])) {
         $gallery_attachment_id = lux_create_attachment($upload_gallery['file'], $upload_gallery['url'], $product_id);
@@ -570,35 +526,12 @@ function lux_update_product_with_image(WP_REST_Request $request)
 
   // Return product info
   return new WP_REST_Response([
-    'id' => $product_id,
-    'title' => $title,
-    'price' => $price,
+    'id'       => $product_id,
+    'title'    => $title,
+    'price'    => $price,
     // 'image_id' => $attachment_id,
   ], 200);
 }
-
-function lux_update_product_with_image_v2(WP_REST_Request $request)
-{
-
-  if (!function_exists('vires_validate_api_key')) {
-    return new WP_Error(
-      'vires_not_available',
-      'Vires API Keys plugin not active',
-      array('status' => 500)
-    );
-  }
-
-
-  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
-
-  if (is_wp_error($api_validation)) {
-    return $api_validation;
-  }
-
-
-  return lux_update_product_with_image($request);
-}
-
 
 add_filter('woocommerce_rest_check_permissions', function ($permission, $context, $object_id, $post_type) {
   if ($post_type === 'product' && current_user_can('customer')) {
@@ -606,19 +539,18 @@ add_filter('woocommerce_rest_check_permissions', function ($permission, $context
       if (get_post($object_id)->post_author == get_current_user_id()) {
         return true;
       }
-    } else if ($context == 'read' || $context === 'create') {
+    } else if ($context == 'read' || $context === 'create'){
       return true;
     }
   }
   return $permission;
 }, 10, 4);
 
-function lux_report_product(WP_REST_Request $request)
-{
+function lux_report_product(WP_REST_Request $request) {
   if (!class_exists('WC_Product')) {
     return new WP_Error('woocommerce_not_active', 'WooCommerce is not active', array('status' => 500));
   }
-  $product_id = (int) $request->get_param('product_id');
+  $product_id = (int)$request->get_param('product_id');
   $report_reason = $request->get_param('report_reason');
 
   // var_dump($gallery_images);
@@ -628,33 +560,11 @@ function lux_report_product(WP_REST_Request $request)
   $admin_email = get_option('admin_email');
 
   $subject = 'User Reported A Product';
-
-  $message = 'Product ID: ' . $product_id . ' <br>';
-  $message .= 'User ID: ' . get_current_user_id() . ' <br>';
-  $message .= 'Reason: ' . $report_reason . ' <br>';
+  
+  $message = 'Product ID: '.$product_id.' <br>';
+  $message .= 'User ID: '.get_current_user_id().' <br>';
+  $message .= 'Reason: '.$report_reason.' <br>';
 
   $headers = array('Content-Type: text/html; charset=UTF-8');
   wp_mail($admin_email, $subject, $message, $headers);
-}
-
-function lux_report_product_v2(WP_REST_Request $request)
-{
-
-  if (!function_exists('vires_validate_api_key')) {
-    return new WP_Error(
-      'vires_not_available',
-      'Vires API Keys plugin not active',
-      array('status' => 500)
-    );
-  }
-
-  // Validate API key (header only)
-  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
-
-  if (is_wp_error($api_validation)) {
-    return $api_validation;
-  }
-
-
-  return lux_report_product($request);
 }
