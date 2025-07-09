@@ -430,7 +430,7 @@ function lux_create_product_with_image_v2(WP_REST_Request $request)
   }
 
   // Validate API key (header only)
-  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'query']);
 
   if (is_wp_error($api_validation)) {
     return $api_validation;
@@ -589,7 +589,7 @@ function lux_update_product_with_image_v2(WP_REST_Request $request)
   }
 
 
-  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'query']);
 
   if (is_wp_error($api_validation)) {
     return $api_validation;
@@ -649,7 +649,7 @@ function lux_report_product_v2(WP_REST_Request $request)
   }
 
   // Validate API key (header only)
-  $api_validation = vires_validate_api_key($request, ['auth_method' => 'header']);
+  $api_validation = vires_validate_api_key($request, ['auth_method' => 'query']);
 
   if (is_wp_error($api_validation)) {
     return $api_validation;
