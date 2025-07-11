@@ -64,6 +64,14 @@ add_action('rest_api_init', function () {
     'permission_callback' => '__return_true',
   ));
 
+
+  register_rest_route('lux/v1', '/create-checkout-session', array(
+    'methods' => 'POST',
+    'callback' => 'lux_create_checkout_session',
+    'permission_callback' => '__return_true', // We handle auth in callback
+  ));
+
+
 });
 
 function lux_api_register(WP_REST_Request $request)
@@ -423,3 +431,134 @@ function lux_api_login_v2(WP_REST_Request $request)
 }
 
 
+function lux_create_checkout_session(WP_REST_Request $request)
+{
+  lux_rest_api_cors_headers();
+
+  // Manual auth check
+  $user_id = get_current_user_id();
+  if (!$user_id) {
+    $auth_header = $request->get_header('authorization');
+    if ($auth_header && preg_match('/Basic (.+)/', $auth_header, $matches)) {
+      $credentials = base64_decode($matches[1]);
+      list($username, $app_password) = explode(':', $credentials);
+
+      $user = wp_authenticate_application_password(null, $username, $app_password);
+      if (!is_wp_error($user) && $user) {
+        $user_id = $user->ID;
+        wp_set_current_user($user_id);
+      }
+    }
+  }
+
+  if (!$user_id) {
+    return wp_send_json([
+      'success' => false,
+      'error' => 'User not authenticated'
+    ]);
+  }
+
+  $body = json_decode($request->get_body(), true);
+  $plan_type = sanitize_text_field($body['plan_type'] ?? 'annual');
+
+  if (!in_array($plan_type, ['monthly', 'annual'])) {
+    return wp_send_json([
+      'success' => false,
+      'error' => 'Invalid plan type'
+    ]);
+  }
+
+  // Generate session token
+  $session_token = wp_generate_password(32, false);
+  $session_key = 'lux_checkout_session_' . $session_token;
+
+  // Store session data
+  $session_data = array(
+    'user_id' => $user_id,
+    'plan_type' => $plan_type,
+    'variation_id' => $plan_type === 'monthly' ? 841 : 842,
+    'product_id' => 482,
+    'created_at' => current_time('timestamp'),
+    'used' => false
+  );
+
+  set_transient($session_key, $session_data, 600); // 10 minutes
+
+  // Build auto-login URL
+  $auto_login_url = home_url('/lux-auto-login') . '?' . http_build_query(array(
+    'session' => $session_token,
+    'plan' => $plan_type
+  ));
+
+  return wp_send_json(array(
+    'success' => true,
+    'session_token' => $session_token,
+    'checkout_url' => $auto_login_url,
+    'expires_in' => 600
+  ));
+}
+
+// 3. Auto-login handler
+add_action('init', 'lux_handle_auto_login', 1);
+function lux_handle_auto_login()
+{
+  if (!isset($_GET['session']) || strpos($_SERVER['REQUEST_URI'], '/lux-auto-login') === false) {
+    return;
+  }
+
+  $session_token = sanitize_text_field($_GET['session']);
+  $session_key = 'lux_checkout_session_' . $session_token;
+
+  $session_data = get_transient($session_key);
+
+  if (!$session_data) {
+    wp_die('Session expired or invalid. Please try again from the app.', 'Session Error');
+  }
+
+  if ($session_data['used']) {
+    wp_die('This session has already been used.', 'Session Error');
+  }
+
+  // Mark as used
+  $session_data['used'] = true;
+  set_transient($session_key, $session_data, 300);
+
+  // Log user in
+  $user = get_user_by('id', $session_data['user_id']);
+  if (!$user) {
+    wp_die('User not found.', 'Error');
+  }
+
+  wp_clear_auth_cookie();
+  wp_set_current_user($session_data['user_id']);
+  wp_set_auth_cookie($session_data['user_id'], true);
+
+  // Store session info for redirect handling
+  if (!session_id()) {
+    session_start();
+  }
+  $_SESSION['lux_app_return'] = true;
+
+  // Redirect to cart with product
+  $cart_url = add_query_arg(array(
+    'add-to-cart' => $session_data['product_id'],
+    'variation_id' => $session_data['variation_id']
+  ), wc_get_cart_url());
+
+  wp_redirect($cart_url);
+  exit;
+}
+
+// 4. Rewrite rules
+add_action('init', 'lux_add_auto_login_rewrite');
+function lux_add_auto_login_rewrite()
+{
+  add_rewrite_rule('^lux-auto-login/?', 'index.php?lux_auto_login=1', 'top');
+}
+
+add_filter('query_vars', 'lux_add_auto_login_query_var');
+function lux_add_auto_login_query_var($vars)
+{
+  $vars[] = 'lux_auto_login';
+  return $vars;
+}

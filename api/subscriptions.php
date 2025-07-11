@@ -21,59 +21,71 @@ add_action('rest_api_init', function () {
     // },
   ));
   register_rest_route('lux/v1', '/users/(?P<user_id>\d+)/subscriptions', array(
-	  // 'methods'  => WP_REST_Server::READABLE, // GET request
-	  'methods' => 'GET',
-	  'callback' => 'lux_get_user_subscriptions',
-	  // 'permission_callback' => 'lux_subscriptions_permissions_check',
+    // 'methods'  => WP_REST_Server::READABLE, // GET request
+    'methods' => 'GET',
+    'callback' => 'lux_get_user_subscriptions',
+    // 'permission_callback' => 'lux_subscriptions_permissions_check',
     // 'permission_callback' => '__return_true',
-    'permission_callback' => function($request) {
+    'permission_callback' => function ($request) {
       return is_user_logged_in();
     },
-	  'args'     => array(
+    'args' => array(
       'user_id' => array(
         'validate_callback' => function ($param, $request, $key) {
           return is_numeric($param) && $param > 0;
         },
         'required' => true,
       ),
-	  ),
-	));
+    ),
+  ));
   register_rest_route('lux/v1', '/users/(?P<user_id>\d+)/membership', array(
-	  'methods'  => WP_REST_Server::READABLE, // GET request
-	  'callback' => 'lux_get_user_membership',
-    'permission_callback' => function($request) {
+    'methods' => WP_REST_Server::READABLE, // GET request
+    'callback' => 'lux_get_user_membership',
+    'permission_callback' => function ($request) {
       return is_user_logged_in();
     },
-	  'args'     => array(
+    'args' => array(
       'user_id' => array(
         'validate_callback' => function ($param, $request, $key) {
           return is_numeric($param) && $param > 0;
         },
         'required' => true,
       ),
-	  ),
-	));
-	// Endpoint: /wp-json/lux/v1/subscriptions/{subscription_id}
-	register_rest_route('lux/v1', '/subscriptions/(?P<subscription_id>\d+)', array(
-	  'methods'  => WP_REST_Server::READABLE, // GET request
-	  'callback' => 'lux_get_single_subscription',
-	  // 'permission_callback' => 'lux_single_subscription_permissions_check',
+    ),
+  ));
+  // Endpoint: /wp-json/lux/v1/subscriptions/{subscription_id}
+  register_rest_route('lux/v1', '/subscriptions/(?P<subscription_id>\d+)', array(
+    'methods' => WP_REST_Server::READABLE, // GET request
+    'callback' => 'lux_get_single_subscription',
+    // 'permission_callback' => 'lux_single_subscription_permissions_check',
     // 'permission_callback' => '__return_true',
-    'permission_callback' => function($request) {
+    'permission_callback' => function ($request) {
       return is_user_logged_in();
     },
-	  'args'     => array(
-			'subscription_id' => array(
-			  'validate_callback' => function ($param, $request, $key) {
-		      return is_numeric($param) && $param > 0;
-			  },
-			  'required' => true,
-			),
-	  ),
-	));
+    'args' => array(
+      'subscription_id' => array(
+        'validate_callback' => function ($param, $request, $key) {
+          return is_numeric($param) && $param > 0;
+        },
+        'required' => true,
+      ),
+    ),
+  ));
+
+
+
+  register_rest_route('lux/v1', '/validate-subscription/(?P<user_id>\d+)', array(
+    'methods' => 'GET',
+    'callback' => 'lux_validate_subscription',
+    'permission_callback' => function ($request) {
+      return is_user_logged_in();
+    }
+  ));
+
 });
 
-function lux_get_all_subscriptions(WP_REST_Request $request) {
+function lux_get_all_subscriptions(WP_REST_Request $request)
+{
   if (!class_exists('WC_Subscriptions') || !function_exists('wcs_get_users_subscriptions')) {
     return new WP_Error(
       'subscriptions_not_available',
@@ -81,12 +93,12 @@ function lux_get_all_subscriptions(WP_REST_Request $request) {
       array('status' => 400)
     );
   }
-  $subscriptions = wcs_get_subscriptions( array(
+  $subscriptions = wcs_get_subscriptions(array(
     'subscription_status' => 'any', // 'active', 'pending', 'cancelled', etc.
-    'limit'               => -1     // Get all
-  ) );
+    'limit' => -1     // Get all
+  ));
   $all_subscriptions = array();
-  foreach ( $subscriptions as $subscription_id => $subscription ) {
+  foreach ($subscriptions as $subscription_id => $subscription) {
     $new_subscription = array();
     $new_subscription['id'] = $subscription_id;
     $new_subscription['status'] = $subscription->get_status();
@@ -94,7 +106,7 @@ function lux_get_all_subscriptions(WP_REST_Request $request) {
     $new_subscription['billing_interval'] = $subscription->get_billing_interval();
     $new_subscription['customer_id'] = $subscription->get_customer_id();
     $new_subscription['billing_email'] = $subscription->get_billing_email();
-    $new_subscription['start_date'] = $subscription->get_time( 'start' );
+    $new_subscription['start_date'] = $subscription->get_time('start');
     $new_subscription['next_payment'] = $subscription->get_date('next_payment');
     $new_subscription['end_date'] = $subscription->get_date('end');
     $new_subscription['total'] = wc_format_decimal($subscription->get_total(), 2);
@@ -103,9 +115,9 @@ function lux_get_all_subscriptions(WP_REST_Request $request) {
       $product = $item->get_product();
       return array(
         'product_id' => $item->get_product_id(),
-        'name'       => $item->get_name(),
-        'quantity'   => $item->get_quantity(),
-        'subtotal'   => wc_format_decimal($item->get_subtotal(), 2),
+        'name' => $item->get_name(),
+        'quantity' => $item->get_quantity(),
+        'subtotal' => wc_format_decimal($item->get_subtotal(), 2),
       );
     }, $subscription->get_items());
     $all_subscriptions[] = $new_subscription;
@@ -121,7 +133,8 @@ function lux_get_all_subscriptions(WP_REST_Request $request) {
  * @param WP_REST_Request $request The REST API request object.
  * @return WP_REST_Response|WP_Error The response or an error.
  */
-function lux_get_user_subscriptions(WP_REST_Request $request) {
+function lux_get_user_subscriptions(WP_REST_Request $request)
+{
   // Check if WooCommerce and WooCommerce Subscriptions are active
   if (!class_exists('WC_Subscriptions') || !function_exists('wcs_get_users_subscriptions')) {
     return new WP_Error(
@@ -141,34 +154,34 @@ function lux_get_user_subscriptions(WP_REST_Request $request) {
       array('status' => 404)
     );
   }
-	// Get subscriptions for the user
-	$subscriptions = wcs_get_users_subscriptions($user_id);
-	if (empty($subscriptions)) {
-	  return new WP_REST_Response(array(
+  // Get subscriptions for the user
+  $subscriptions = wcs_get_users_subscriptions($user_id);
+  if (empty($subscriptions)) {
+    return new WP_REST_Response(array(
       'message' => __('No subscriptions found for this user.', 'lux-subscriptions-api'),
       'subscriptions' => array(),
-	  ), 200);
-	}
+    ), 200);
+  }
   $subscription_data = array();
   // Loop through subscriptions and collect relevant data
   foreach ($subscriptions as $subscription) {
     $subscription_data[] = array(
-      'id'               => $subscription->get_id(),
-      'status'           => $subscription->get_status(),
-      'billing_period'   => $subscription->get_billing_period(),
+      'id' => $subscription->get_id(),
+      'status' => $subscription->get_status(),
+      'billing_period' => $subscription->get_billing_period(),
       'billing_interval' => $subscription->get_billing_interval(),
-      'start_date'       => $subscription->get_date('start', 'lux'),
-      'next_payment'     => $subscription->get_date('next_payment', 'lux'),
-      'end_date'         => $subscription->get_date('end', 'lux'),
-      'total'            => wc_format_decimal($subscription->get_total(), 2),
-      'currency'         => $subscription->get_currency(),
-      'items'            => array_map(function ($item) {
+      'start_date' => $subscription->get_date('start', 'lux'),
+      'next_payment' => $subscription->get_date('next_payment', 'lux'),
+      'end_date' => $subscription->get_date('end', 'lux'),
+      'total' => wc_format_decimal($subscription->get_total(), 2),
+      'currency' => $subscription->get_currency(),
+      'items' => array_map(function ($item) {
         $product = $item->get_product();
         return array(
           'product_id' => $item->get_product_id(),
-          'name'       => $item->get_name(),
-          'quantity'   => $item->get_quantity(),
-          'subtotal'   => wc_format_decimal($item->get_subtotal(), 2),
+          'name' => $item->get_name(),
+          'quantity' => $item->get_quantity(),
+          'subtotal' => wc_format_decimal($item->get_subtotal(), 2),
         );
       }, $subscription->get_items()),
     );
@@ -178,7 +191,8 @@ function lux_get_user_subscriptions(WP_REST_Request $request) {
   ), 200);
 }
 
-function lux_get_user_membership(WP_REST_Request $request) {
+function lux_get_user_membership(WP_REST_Request $request)
+{
   if (!class_exists('WC_Subscriptions') || !function_exists('wcs_get_users_subscriptions')) {
     return new WP_Error(
       'subscriptions_not_available',
@@ -201,19 +215,19 @@ function lux_get_user_membership(WP_REST_Request $request) {
       if ((int) $item->get_product_id() === 482) {
         return new WP_REST_Response(array(
           'membership' => array(
-            'id'               => $subscription->get_id(),
-            'status'           => $subscription->get_status(),
-            'billing_period'   => $subscription->get_billing_period(),
+            'id' => $subscription->get_id(),
+            'status' => $subscription->get_status(),
+            'billing_period' => $subscription->get_billing_period(),
             'billing_interval' => $subscription->get_billing_interval(),
-            'start_date'       => $subscription->get_date('start', 'site'),
-            'next_payment'     => $subscription->get_date('next_payment', 'site'),
-            'end_date'         => $subscription->get_date('end', 'site'),
-            'total'            => wc_format_decimal($subscription->get_total(), 2),
-            'currency'         => $subscription->get_currency(),
-            'product_id'       => $item->get_product_id(),
-            'product_name'     => $item->get_name(),
-            'quantity'         => $item->get_quantity(),
-            'subtotal'         => wc_format_decimal($item->get_subtotal(), 2),
+            'start_date' => $subscription->get_date('start', 'site'),
+            'next_payment' => $subscription->get_date('next_payment', 'site'),
+            'end_date' => $subscription->get_date('end', 'site'),
+            'total' => wc_format_decimal($subscription->get_total(), 2),
+            'currency' => $subscription->get_currency(),
+            'product_id' => $item->get_product_id(),
+            'product_name' => $item->get_name(),
+            'quantity' => $item->get_quantity(),
+            'subtotal' => wc_format_decimal($item->get_subtotal(), 2),
           ),
         ), 200);
       }
@@ -225,7 +239,8 @@ function lux_get_user_membership(WP_REST_Request $request) {
   ), 200);
 }
 
-function lux_subscriptions_permissions_check(WP_REST_Request $request) {
+function lux_subscriptions_permissions_check(WP_REST_Request $request)
+{
   $user_id = (int) $request['user_id'];
   $current_user_id = get_current_user_id();
   // Allow access if the user is requesting their own subscriptions or is an admin
@@ -239,7 +254,8 @@ function lux_subscriptions_permissions_check(WP_REST_Request $request) {
   );
 }
 
-function lux_get_single_subscription(WP_REST_Request $request) {
+function lux_get_single_subscription(WP_REST_Request $request)
+{
   // Check if WooCommerce and WooCommerce Subscriptions are active
   if (!class_exists('WC_Subscriptions') || !function_exists('wcs_get_users_subscriptions')) {
     return new WP_Error(
@@ -289,26 +305,88 @@ function lux_get_single_subscription(WP_REST_Request $request) {
  * @param WP_REST_Request $request The REST API request object.
  * @return bool|WP_Error True if permitted, WP_Error if not.
  */
-function lux_single_subscription_permissions_check(WP_REST_Request $request) {
+function lux_single_subscription_permissions_check(WP_REST_Request $request)
+{
   $subscription_id = (int) $request['subscription_id'];
   $current_user_id = get_current_user_id();
   // Retrieve the subscription to check ownership
   $subscription = wcs_get_subscription($subscription_id);
   if (!$subscription) {
-	  return new WP_Error(
-	    'subscription_not_found',
-	    __('Subscription not found.', 'lux-subscriptions-api'),
-	    array('status' => 404)
-	  );
+    return new WP_Error(
+      'subscription_not_found',
+      __('Subscription not found.', 'lux-subscriptions-api'),
+      array('status' => 404)
+    );
   }
   $subscription_user_id = $subscription->get_user_id();
   // Allow access if the user owns the subscription or is an admin
   // if ($current_user_id === $subscription_user_id || current_user_can('manage_woocommerce')) {
-    return true;
+  return true;
   // }
   // return new WP_Error(
   //   'rest_forbidden',
   //   __('You do not have permission to access this subscription.', 'lux-subscriptions-api'),
   //   array('status' => 403)
   // );
+}
+
+
+
+
+
+
+function lux_validate_subscription(WP_REST_Request $request)
+{
+  lux_rest_api_cors_headers();
+
+  $user_id = $request->get_param('user_id');
+  $current_user_id = get_current_user_id();
+
+  // Verify user can only check their own subscription
+  if ($user_id != $current_user_id) {
+    return wp_send_json([
+      'success' => false,
+      'error' => 'Unauthorized'
+    ]);
+  }
+
+  // Check if user has active membership subscription
+  $has_active_membership = false;
+  $membership_data = null;
+
+  if (function_exists('wcs_get_users_subscriptions')) {
+    $subscriptions = wcs_get_users_subscriptions($user_id);
+
+    foreach ($subscriptions as $subscription) {
+      // Check if it's the membership product
+      foreach ($subscription->get_items() as $item) {
+        if ((int) $item->get_product_id() === 482) {
+          $status = $subscription->get_status();
+
+          // Only 'active' status is considered valid
+          // All other statuses (on-hold, cancelled, expired, pending-cancel) are invalid
+          $has_active_membership = ($status === 'active');
+
+          $membership_data = array(
+            'subscription_id' => $subscription->get_id(),
+            'status' => $status,
+            'start_date' => $subscription->get_date('start', 'site'),
+            'next_payment' => $subscription->get_date('next_payment', 'site'),
+            'end_date' => $subscription->get_date('end', 'site'),
+            'total' => wc_format_decimal($subscription->get_total(), 2),
+            'currency' => $subscription->get_currency(),
+            'product_name' => $item->get_name(),
+            'billing_period' => $subscription->get_billing_period()
+          );
+          break 2; // Break both loops
+        }
+      }
+    }
+  }
+
+  return wp_send_json([
+    'success' => true,
+    'is_active' => $has_active_membership,
+    'subscription_data' => $membership_data
+  ]);
 }
