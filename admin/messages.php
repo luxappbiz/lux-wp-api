@@ -174,7 +174,7 @@ function lux_admin_conversations_page_content() {
                     </td>
                     <td>
                       <a href="<?= $site_url . '/wp-admin/user-edit.php?user_id=' . $conversation->owner_user_id ?>">
-                        <?= $$conversation->owner_user_id ?> <?= $owner_name ?>  
+                        <?= $conversation->owner_user_id ?> <?= $owner_name ?>  
                       </a>
                     </td>
                     <td><?= $conversation->name ?></td>
@@ -221,8 +221,8 @@ function lux_admin_conversations_page_content() {
                       </a>
                     </td>
                     <td>
-                      <a href="<?= $$site_url . '/wp-admin/user-edit.php?user_id=' . $message->user_id ?>">
-                        <?= $message->user_id ?> <? $user_name ?>
+                      <a href="<?= $site_url . '/wp-admin/user-edit.php?user_id=' . $message->user_id ?>">
+                        <?= $message->user_id ?> <?= $user_name ?>
                       </a>
                     </td>
                     <td><?= $message->message ?></td>
