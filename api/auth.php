@@ -13,6 +13,11 @@ add_action('rest_api_init', function () {
     'permission_callback' => '__return_true',
   ));
 
+  register_rest_route('lux/v3', '/login', array(
+    'methods' => 'POST',
+    'callback' => 'lux_api_login_v3',
+  ));
+
   register_rest_route('lux/v1', '/user', array(
     'methods' => 'GET',
     'callback' => 'lux_mobile_app_get_user_func',
@@ -190,8 +195,7 @@ function lux_api_send_verification_email($user_id)
   return wp_mail($user_data->user_email, 'LUX Email Verification', $body, $headers);
 }
 
-function lux_api_login(WP_REST_Request $request)
-{
+function lux_api_login(WP_REST_Request $request) {
   lux_rest_api_cors_headers();
   $body = $request->get_body();
   $body = json_decode($body, true);
@@ -219,13 +223,78 @@ function lux_api_login(WP_REST_Request $request)
   wp_send_json([
     'success' => true,
     'user' => $user->data,
-    'token' => $generated_token,
-    'application_password' => $application_password[0]
+    // 'token' => $generated_token,
+    'token' => $application_password[0],
+    'application_password' => $application_password[0],
   ]);
 }
 
-function lux_generate_random_string($length = 10)
-{
+function lux_get_user_object_from_user_id($user_id){
+  $user = get_user_by('ID', $user_id);
+  if (!$user) {
+    return null;
+  }
+  $user->data->user_pass = null;
+  $user->data->image = false;
+  $profile_avatar = get_field('profile_avatar', 'user_' . $user->ID);
+  if ($profile_avatar) {
+    $user->data->image = wp_get_attachment_image_url($profile_avatar, 'full');
+  } else {
+    $user->data->image = get_avatar_url($user->ID, array('size' => '512'));
+  }
+  $user->data->first_name = get_user_meta($user->ID, 'first_name', true);
+  $user->data->last_name = get_user_meta($user->ID, 'last_name', true);
+  $user->data->affiliate_id = false;
+  if (function_exists('gigfiliate_is_active_affiliate') && gigfiliate_is_active_affiliate($user->ID)) {
+    $user->data->affiliate_id = (int)get_user_meta($user->ID, 'v_affiliate_id', true);
+  }
+  // $user->data->phone = get_user_meta($user->ID, 'phone', true);
+  $user->data->phone = get_field('phone', 'user_' . $user->ID);
+  $user->data->instagram = get_field('instagram', 'user_' . $user->ID);
+  $user->data->occupation = get_field('occupation', 'user_' . $user->ID);
+  $user->data->gender = get_user_meta($user->ID, 'gender', true);
+  $user->data->total_unread_messages_count = lux_api_helper_get_total_unread_messages_count($user->ID);
+  $user->data->balances = [
+    'incoming' => get_user_meta($user->ID, 'lux_incoming_balance', true),
+    'available' => get_user_meta($user->ID, 'lux_available_balance', true),
+  ];
+  $user->data->capabilities = get_field('capabilities', 'user_' . $user->ID);
+  $user->data->is_verified = get_user_meta($user->ID, 'email_verified', true);
+  return $user->data;
+}
+
+function lux_api_login_v3( WP_REST_Request $request ) {
+  $body = $request->get_body();
+  $body = json_decode($body, true);
+  $login = $body['login'];
+  $password = $body['password'];
+  $user = false;
+  // $user = get_user_by( 'email', $email );
+  if (filter_var($login, FILTER_VALIDATE_EMAIL)) {
+    $user = get_user_by('email', $login);
+  } else {
+    $user = get_user_by('login', $login);
+  }
+  if ( !$user || !wp_check_password( $password, $user->data->user_pass, $user->ID ) ) {
+    wp_send_json([
+      'success'=>false,
+      'error'=>'Invalid Credentials'
+    ]);
+  }
+  // Get user agent for application password name
+  $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? 'Unknown App';
+  $app_name = !empty($user_agent) ? substr($user_agent, 0, 65) : 'mobile-app'; 
+  $application_password = WP_Application_Passwords::create_new_application_password($user->ID, array('name' => $app_name));
+  $user = lux_get_user_object_from_user_id($user->ID);
+  wp_send_json([
+    'success' => true,
+    'user' => $user,
+    'token' => $application_password[0],
+    'application_password' => $application_password[0],
+  ]);
+}
+
+function lux_generate_random_string($length = 10) {
   $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
   $charactersLength = strlen($characters);
   $randomString = '';
@@ -500,65 +569,52 @@ function lux_create_checkout_session(WP_REST_Request $request)
 
 // 3. Auto-login handler
 add_action('init', 'lux_handle_auto_login', 1);
-function lux_handle_auto_login()
-{
+function lux_handle_auto_login() {
   if (!isset($_GET['session']) || strpos($_SERVER['REQUEST_URI'], '/lux-auto-login') === false) {
     return;
   }
-
   $session_token = sanitize_text_field($_GET['session']);
   $session_key = 'lux_checkout_session_' . $session_token;
-
   $session_data = get_transient($session_key);
-
   if (!$session_data) {
     wp_die('Session expired or invalid. Please try again from the app.', 'Session Error');
   }
-
   if ($session_data['used']) {
     wp_die('This session has already been used.', 'Session Error');
   }
-
   // Mark as used
   $session_data['used'] = true;
   set_transient($session_key, $session_data, 300);
-
   // Log user in
   $user = get_user_by('id', $session_data['user_id']);
   if (!$user) {
     wp_die('User not found.', 'Error');
   }
-
   wp_clear_auth_cookie();
   wp_set_current_user($session_data['user_id']);
   wp_set_auth_cookie($session_data['user_id'], true);
-
   // Store session info for redirect handling
   if (!session_id()) {
     session_start();
   }
   $_SESSION['lux_app_return'] = true;
-
   // Redirect to cart with product
   $cart_url = add_query_arg(array(
     'add-to-cart' => $session_data['product_id'],
     'variation_id' => $session_data['variation_id']
   ), wc_get_cart_url());
-
   wp_redirect($cart_url);
   exit;
 }
 
 // 4. Rewrite rules
 add_action('init', 'lux_add_auto_login_rewrite');
-function lux_add_auto_login_rewrite()
-{
+function lux_add_auto_login_rewrite() {
   add_rewrite_rule('^lux-auto-login/?', 'index.php?lux_auto_login=1', 'top');
 }
 
 add_filter('query_vars', 'lux_add_auto_login_query_var');
-function lux_add_auto_login_query_var($vars)
-{
+function lux_add_auto_login_query_var($vars) {
   $vars[] = 'lux_auto_login';
   return $vars;
 }

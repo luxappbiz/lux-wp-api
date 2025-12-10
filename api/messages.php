@@ -11,6 +11,13 @@ add_action('rest_api_init', function () {
       return is_user_logged_in();
     },
   ));
+  register_rest_route('lux/v3', '/conversations', array(
+    'methods' => 'GET',
+    'callback' => 'lux_api_get_conversations_v3',
+    'permission_callback' => function($request) {
+      return is_user_logged_in();
+    },
+  ));
   /**
    * API - Create new conversation
    */
@@ -170,6 +177,154 @@ function lux_api_get_conversations( WP_REST_Request $request ) {
     'sort' => $sort,
     'conversations' => $conversations,
   ), 201);
+}
+
+function lux_api_get_conversations_v3( WP_REST_Request $request ) {
+  // Get Conversations by User ID
+  $user_id = get_current_user_id();
+  // Pagination support
+  $limit = $request->get_param('limit') ? intval($request->get_param('limit')) : 20;
+  $page = $request->get_param('paged') ?? $request->get_param('page') ?? 1;
+  if ($page < 1) {
+    return new WP_REST_Response(array(
+      'error' => 'Invalid page parameter.',
+      'message' => 'The page parameter must be a positive integer (page >= 1).',
+    ), 400);
+  }
+  $offset = ($page - 1) * $limit;
+  if (!$user_id) {
+    return new WP_REST_Response(array(
+      'error' => 'User ID is required to get conversations.',
+      'message' => 'User ID is required to get conversations.',
+    ), 500);
+  }
+  global $wpdb;
+  $table_conv_users = $wpdb->prefix . 'lux_conversation_users';
+  $table_conversations = $wpdb->prefix . 'lux_conversations';
+  // Check for include_deleted param
+  $include_deleted = isset($request['include_deleted']) ? true : false;
+  $where = "cu.user_id = %d";
+  if ( ! $include_deleted ) {
+    $where .= " AND c.deleted_at IS NULL";
+  }
+  // Get total count first
+  $count_sql = $wpdb->prepare("
+    SELECT COUNT(DISTINCT c.id)
+    FROM $table_conversations c
+    INNER JOIN $table_conv_users cu ON cu.conversation_id = c.id
+    WHERE $where
+  ", $user_id);
+  $total_items = (int)$wpdb->get_var($count_sql);
+  $total_pages = ceil($total_items / $limit);
+  // Get paginated results
+  $sql = $wpdb->prepare("
+    SELECT c.id AS conversation_id
+    FROM $table_conversations c
+    INNER JOIN $table_conv_users cu ON cu.conversation_id = c.id
+    WHERE $where
+    GROUP BY c.id
+    ORDER BY c.updated_at DESC
+    LIMIT %d OFFSET %d
+  ", $user_id, $limit, $offset);
+  $conversation_ids_data = $wpdb->get_results($sql);
+  $conversation_ids = array_map(function($row) {
+    return $row->conversation_id;
+  }, $conversation_ids_data);
+  $conversations = array();
+  if (!empty($conversation_ids)) {
+    foreach ($conversation_ids as $conversation_id) {
+      // Fetch the conversation data
+      $table_conversations = $wpdb->prefix . 'lux_conversations';
+      $sql_conversation = $wpdb->prepare("SELECT * FROM $table_conversations WHERE id = %d", $conversation_id);
+      $conversation_data = $wpdb->get_row($sql_conversation);
+      if ($conversation_data) {
+        // Get all other users in the conversation (excluding current user)
+        $table_conv_users = $wpdb->prefix . 'lux_conversations_users';
+        $sql_users = $wpdb->prepare("SELECT user_id FROM $table_conv_users WHERE conversation_id = %d AND user_id != %d", $conversation_id, $user_id);
+        $other_conversation_users_data = $wpdb->get_results($sql_users);
+        $other_user_ids = array_map(function($row) {
+          return (int)$row->user_id;
+        }, $other_conversation_users_data);
+        // Get all participants including current user
+        $conversation_user_ids = lux_get_conversation_participants($conversation_id);
+        // Generate conversation name from all users
+        $conversation_name = lux_get_conversation_name_from_users($conversation_data, $other_user_ids, $user_id);
+        // Get conversation image (uses first user's avatar for now)
+        $image_url = lux_get_conversation_image_from_users($other_user_ids);
+        // Get all participant images for group conversations
+        $participant_images = lux_get_conversation_participant_images($other_user_ids, 4);
+        // Build other_conversation_users array with detailed user info
+        $other_conversation_users = array();
+        foreach ($other_user_ids as $other_user_id) {
+          $other_user = get_userdata($other_user_id);
+          if ($other_user) {
+            $first_name = get_user_meta($other_user_id, 'first_name', true);
+            $last_name = get_user_meta($other_user_id, 'last_name', true);
+            $display_name = trim($first_name . ' ' . $last_name) ?: $other_user->display_name;
+            $profile_avatar = get_field('profile_avatar', 'user_' . $other_user_id);
+            $profile_pic_url = $profile_avatar 
+              ? wp_get_attachment_image_url($profile_avatar, 'full') 
+              : get_avatar_url($other_user_id, array('size' => '512'));
+            $other_conversation_users[] = array(
+              'user_id' => (int)$other_user_id,
+              'name' => $display_name,
+              'user_nicename' => $other_user->user_nicename,
+              'image_url' => $profile_pic_url,
+            );
+          }
+        }
+        // Keep first user ID for backwards compatibility
+        $other_conversation_user_id = !empty($other_user_ids) ? $other_user_ids[0] : null;
+        // Unread Messages Count
+        $table_messages_read = $wpdb->prefix . 'lux_messages_read';
+        $sql = $wpdb->prepare("SELECT COUNT(*) FROM $table_messages_read WHERE conversation_id = %d AND user_id = %d AND read_at IS null", $conversation_id, $user_id);
+        $messages_unread_count = $wpdb->get_var($sql);
+        // Last message preview
+        $last_msg = $wpdb->get_var(
+          $wpdb->prepare(
+            "SELECT message FROM {$wpdb->prefix}lux_messages WHERE conversation_id = %d ORDER BY created_at DESC LIMIT 1",
+            $conversation_id
+          )
+        );
+        $last_message_preview = $last_msg ? wp_trim_words( wp_strip_all_tags( $last_msg ), 12 ) : '';
+        $conversations[] = array(
+          'id' => (int)$conversation_id,
+          'name' => $conversation_name,
+          'other_conversation_user_id' => $other_conversation_user_id, // Backwards compatibility - first other user
+          'other_conversation_user_ids' => $other_user_ids, // All other user IDs (backwards compatibility)
+          'other_conversation_users' => $other_conversation_users, // Detailed user info array
+          'conversation_user_ids' => $conversation_user_ids, // All participants including current user
+          'participant_count' => count($conversation_user_ids),
+          'image_url' => $image_url,
+          'participant_images' => $participant_images, // Array of image URLs for group conversations
+          'messages_unread_count' => (int)$messages_unread_count,
+          'last_message_preview' => $last_message_preview,
+          'updated_at' => $conversation_data->updated_at,
+          'created_at' => $conversation_data->created_at,
+          'deleted_at' => $conversation_data->deleted_at,
+        );
+      }
+    }
+  }
+  $sort = 'desc';
+  // Sort the $conversations array by the 'updated_at' field
+  usort($conversations, function($a, $b) use ($sort) {
+    $timestamp_a = strtotime($a['updated_at']);
+    $timestamp_b = strtotime($b['updated_at']);
+    return $sort == 'asc' ? $timestamp_a - $timestamp_b : $timestamp_b - $timestamp_a;
+  });
+  return new WP_REST_Response(array(
+    'sort' => $sort,
+    'conversations' => $conversations,
+    'pagination' => array(
+      'page' => $page, // backwards compatibility - deprecated, use current_page instead
+      'limit' => $limit, // backwards compatibility - deprecated, use per_page instead
+      'current_page' => (int)$page,
+      'per_page' => (int)$limit,
+      'total_items' => $total_items,
+      'total_pages' => (int)$total_pages,
+    ),
+  ), 200);
 }
 
 function lux_api_create_conversation( WP_REST_Request $request ) {
