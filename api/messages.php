@@ -11,7 +11,6 @@ add_action('rest_api_init', function () {
       return is_user_logged_in();
     },
   ));
-
   register_rest_route('lux/v3', '/conversations', array(
     'methods' => 'GET',
     'callback' => 'lux_api_get_conversations_v3',
