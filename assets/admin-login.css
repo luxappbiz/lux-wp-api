@@ -1,66 +1,141 @@
 body {
   display: flex;
-  background-color: black;
-  /*background-image: url(./../img/champagne-roses-skyline.jpg);*/
+  background: linear-gradient(135deg, #000000 0%, #1a1a1a 50%, #000000 100%);
+  background-image: url('https://luxapp.biz/wp-content/uploads/2024/12/2022-pagani-huayra.webp');
   background-position: center;
   background-size: cover;
+  background-attachment: fixed;
+  min-height: 100vh;
+  position: relative;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: black;
+  opacity: 0.5;
+  pointer-events: none;
+  z-index: 0;
 }
 
 body #login {
-  background-color: black;
-  padding: 1rem;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px);
+  padding: 2.5rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  position: relative;
+  z-index: 1;
 }
 
 .login h1 a {
   background-image: url('https://luxapp.biz/wp-content/uploads/2024/09/LUX-Bugatti.png');
   background-image: none, url('https://luxapp.biz/wp-content/uploads/2024/09/LUX-Bugatti.png');
-  width: 180px;
+  width: 200px;
+  height: 80px;
   background-size: contain;
   background-position: center;
+  background-repeat: no-repeat;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.login h1 a:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
 }
 
 .login form {
   background-color: transparent;
-  border: 0px;
+  border: 0;
   padding: 0;
-  box-shadow: 0 0 0 0;
+  box-shadow: none;
+  margin-top: 2rem;
 }
 
 label {
-  color: white;
-  font-size: 16px;
-  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 15px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 input#user_login,
 input#user_pass {
-  background-color: rgba(0, 0, 0, 0.6);
-  height: 44px;
-  color: inherit;
-  padding: 8px 15px;
-  border: solid 1px white;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.05);
+  height: 48px;
   color: #fff;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 400;
+  width: 100%;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+input#user_login::placeholder,
+input#user_pass::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+input#user_login:hover,
+input#user_pass:hover {
+  border-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.08);
 }
 
 input#user_login:focus,
 input#user_pass:focus {
-  box-shadow: 0 0 0 0;
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 p.forgetmenot {
-  margin-top: 9px;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 input#rememberme {
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+input#rememberme:hover {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+input#rememberme:checked {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.9);
 }
 
 input#rememberme:focus {
-  border-color: #000;
-  box-shadow: 0 0 0 1px #000;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+.forgetmenot label {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  user-select: none;
 }
 
 input#wp-submit {
@@ -75,9 +150,30 @@ input#wp-submit {
   font-family: 'Playfair Display', serif !important;
   font-style: italic !important;
   width: 100%;
-  height: 3.25rem;
-  font-size: 1rem;
-  border: none !important;  
+  height: 3.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none !important;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  margin-top: 0.5rem;
+}
+
+input#wp-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+input#wp-submit:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+input#wp-submit:focus {
+  outline: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 0 3px rgba(255, 255, 255, 0.2);
 }
 
 /*
@@ -136,45 +232,141 @@ input#wp-submit::after {
 
 .login #backtoblog a,
 .login #nav a {
-  color: white;
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.login #backtoblog a:hover,
+.login #nav a:hover {
+  color: rgba(255, 255, 255, 1);
+  text-decoration: underline;
 }
 
 .login .button.wp-hide-pw {
-  color: #000;
+  color: rgba(255, 255, 255, 0.7);
+  background: transparent;
+  border: none;
+  padding: 0;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.login .button.wp-hide-pw:hover {
+  color: rgba(255, 255, 255, 1);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 .login .button.wp-hide-pw:focus {
-  background: 0 0;
-  border-color: #000;
-  box-shadow: 0 0 0 1px #000;
-  outline: 2px solid transparent;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
 }
 
 .login #login_error,
 .login .message,
 .login .success {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
   color: #fff;
-  border-left: 4px solid #000;
+  border-left: 4px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.login #login_error {
+  border-left-color: rgba(239, 68, 68, 0.6);
+  background-color: rgba(127, 29, 29, 0.3);
+}
+
+.login .success {
+  border-left-color: rgba(34, 197, 94, 0.6);
+  background-color: rgba(20, 83, 45, 0.3);
 }
 
 a.privacy-policy-link {
-  color: white;
+  color: rgba(255, 255, 255, 0.8);
+  transition: color 0.2s ease;
+}
+
+a.privacy-policy-link:hover {
+  color: rgba(255, 255, 255, 1);
 }
 
 .login #nav a,
 .login #backtoblog a,
 .login #backtoblog a:hover,
-.login #nav a:hover,
-.login h1 a,
-.login h1 a:hover {
-  color: white;
-  text-decoration: underline;
+.login #nav a:hover {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
   border: none !important;
   padding: 0.5rem !important;
-  font-size: 1rem;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.login #nav a:hover,
+.login #backtoblog a:hover {
+  color: rgba(255, 255, 255, 1);
+  text-decoration: underline;
+}
+
+.login h1 a,
+.login h1 a:hover {
+  border: none !important;
+  padding: 0 !important;
 }
 
 form.admin-email-confirm-form {
-  color: white;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* Additional improvements */
+.login form .input,
+.login input[type="text"],
+.login input[type="password"] {
+  margin-bottom: 1rem;
+}
+
+.login #loginform {
+  padding-top: 0;
+}
+
+/* Responsive improvements */
+@media (max-width: 782px) {
+  body #login {
+    padding: 2rem 1.5rem;
+    margin: 1rem;
+  }
+  
+  .login h1 a {
+    width: 160px;
+    height: 60px;
+  }
+  
+  input#wp-submit {
+    height: 3rem;
+    font-size: 1rem;
+  }
+}
+
+/* Loading state */
+input#wp-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+/* Accessibility improvements */
+.login *:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline-offset: 2px;
 }
